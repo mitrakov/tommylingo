@@ -1,18 +1,12 @@
 package com.mitrakoff.self.tommylingo
 
-import cats.effect.{Async, ExitCode, IO, IOApp, Resource}
+import cats.effect.{Async, IO, IOApp, Resource}
 import org.http4s.HttpApp
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.middleware.Logger
-import cats.data.Kleisli
-import cats.syntax.all.*
-import com.comcast.ip4s.*
+import com.comcast.ip4s.{ipv4, port}
 import doobie.util.ExecutionContexts
-import doobie.hikari._
-import org.http4s.*
-import org.http4s.ember.server.EmberServerBuilder
-import org.http4s.implicits.*
-import org.http4s.server.middleware.Logger
+import doobie.hikari.HikariTransactor
 
 object Main extends IOApp.Simple:
   val run: IO[Unit] = this.run[IO]

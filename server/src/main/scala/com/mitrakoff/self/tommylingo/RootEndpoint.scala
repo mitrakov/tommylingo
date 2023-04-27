@@ -1,13 +1,13 @@
 package com.mitrakoff.self.tommylingo
 
 import cats.effect.Async
-import cats.implicits.*
+import cats.implicits.{toFlatMapOps, catsSyntaxApply}
 import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes, MediaType}
 import org.http4s.dsl.Http4sDsl
-import org.http4s.scalaxml.{xml, xmlEncoder}
+import org.http4s.scalaxml.{xmlDecoder, xmlEncoder}
 
 class RootEndpoint[F[_]: Async](service: RootService[F]) extends Http4sDsl[F]:
-  given EntityDecoder[F, DictKey] = xml map { elem =>
+  given EntityDecoder[F, DictKey] = xmlDecoder map { elem =>
     val langCode = (elem \ "langCode").text
     val key = (elem \ "key").text
     DictKey(1, langCode, key)
@@ -17,7 +17,7 @@ class RootEndpoint[F[_]: Async](service: RootService[F]) extends Http4sDsl[F]:
     EntityDecoder.decodeBy(MediaType.text.xml, MediaType.text.html, MediaType.application.xml) { msg =>
       for {
         dictKey <- implicitly[EntityDecoder[F, DictKey]].decode(msg, strict = false)
-        translation <- xml.map { elem => (elem \ "translation").text }.decode(msg, strict = false)
+        translation <- xmlDecoder.map { elem => (elem \ "translation").text }.decode(msg, strict = false)
       } yield Dict(dictKey, translation)
     }
 
