@@ -12,17 +12,12 @@ lazy val root = (project in file("."))
     scalaVersion := "3.1.0",
     libraryDependencies ++= Seq(
       "org.http4s"      %% "http4s-ember-server" % Http4sVersion,
-      "org.http4s"      %% "http4s-ember-client" % Http4sVersion,
       "org.http4s"      %% "http4s-circe"        % Http4sVersion,
       "org.http4s"      %% "http4s-scala-xml"    % Http4sVersion,
       "org.http4s"      %% "http4s-dsl"          % Http4sVersion,
-      "org.scalameta"   %% "munit"               % MunitVersion           % Test,
-      "org.typelevel"   %% "munit-cats-effect-3" % MunitCatsEffectVersion % Test,
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion,
-//      "io.circe" %% "circe-generic" % "0.14.1",
       "org.tpolecat" %% "doobie-postgres" % doobieVersion,
       "org.tpolecat" %% "doobie-hikari" % doobieVersion,
-      //"com.mthaler" % "xmlconfect_2.13" % "0.4.9"
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )

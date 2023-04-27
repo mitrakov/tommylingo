@@ -2,8 +2,6 @@ package com.mitrakoff.self.tommylingo
 
 import cats.effect.{Async, ExitCode, IO, IOApp, Resource}
 import org.http4s.HttpApp
-import org.http4s.client.Client
-import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.middleware.Logger
 import cats.data.Kleisli
@@ -12,8 +10,6 @@ import com.comcast.ip4s.*
 import doobie.util.ExecutionContexts
 import doobie.hikari._
 import org.http4s.*
-import org.http4s.client.Client
-import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits.*
 import org.http4s.server.middleware.Logger
@@ -22,30 +18,15 @@ object Main extends IOApp.Simple:
   val run: IO[Unit] = this.run[IO]
 
   private def run[F[_] : Async]: F[Nothing] = {
-    createTransactor().use { tx =>
-      {
-        for {
-          client: Client[F] <- EmberClientBuilder.default[F].build
-          helloWorldAlg: HelloWorld[F] = HelloWorld.impl[F]
-          jokeAlg: Jokes[F] = Jokes.impl[F](client)
-          db: Db[F] = Db(tx)
-          dao: Dao[F] = Dao(db)
-          service: RootService[F] = RootService(dao)
-          rootEndpoint: RootEndpoint[F] = RootEndpoint(service)
+    createTransactor() use { tx =>
+      val db: Db[F]= Db(tx)
+      val dao: Dao[F]= Dao(db)
+      val service: RootService[F]= RootService(dao)
+      val rootEndpoint: RootEndpoint[F]= RootEndpoint(service)
+      val httpApp: HttpApp[F]= (rootEndpoint.routes).orNotFound
+      val finalHttpApp: HttpApp[F]= Logger.httpApp(logHeaders = true, logBody = true)(httpApp)
 
-
-          httpApp: HttpApp[F] =
-            (
-              TommylingoRoutes.helloWorldRoutes[F](helloWorldAlg) <+>
-              TommylingoRoutes.jokeRoutes[F](jokeAlg) <+>
-              rootEndpoint.routes
-            ).orNotFound
-
-          finalHttpApp: HttpApp[F] = Logger.httpApp(logHeaders = true, logBody = true)(httpApp)
-
-          _ <- EmberServerBuilder.default[F].withHost(ipv4"0.0.0.0").withPort(port"8080").withHttpApp(finalHttpApp).build
-        } yield ()
-      }.useForever
+      EmberServerBuilder.default[F].withHost(ipv4"0.0.0.0").withPort(port"8080").withHttpApp(finalHttpApp).build.useForever
     }
   }
 
