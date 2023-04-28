@@ -16,7 +16,7 @@ CREATE TABLE dict (
 
 class Dao[F[_]](db: Db[F]):
   def fetchWithLimit(userId: Int, langCode: String, limit: Int): F[List[(String, String)]] =
-    db.run(sql"""SELECT key, translation FROM dict WHERE user_id = $userId AND lang_code = $langCode LIMIT $limit;""".query[(String, String)].to[List])
+    db.run(sql"""SELECT key, translation FROM dict WHERE user_id = $userId AND lang_code = $langCode ORDER BY random() LIMIT $limit;""".query[(String, String)].to[List])
 
   def fetchAllKeys(userId: Int, langCode: String): F[List[String]] =
     db.run(sql"""SELECT key FROM dict WHERE user_id = $userId AND lang_code = $langCode;""".query[String].to[List])
