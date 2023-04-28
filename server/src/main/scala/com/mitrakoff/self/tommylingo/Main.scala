@@ -26,9 +26,9 @@ object Main extends IOApp.Simple:
 
   private def createTransactor[F[_]: Async](
      driver: String = "org.postgresql.Driver",
-     url: String = "jdbc:postgresql://localhost:5432/postgres",
-     user: String = "postgres",
-     password: String = "postgres",
+     url: String = "jdbc:postgresql://mitrakoff.com:5432/varlam",
+     user: String = "mitrakov",
+     password: String = "",
    ): Resource[F, HikariTransactor[F]] = {
     for {
       connectEc <- ExecutionContexts.fixedThreadPool[F](32)
