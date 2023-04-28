@@ -23,7 +23,9 @@ class Dao[F[_]](db: Db[F]):
 
   def persist(dict: Dict): F[Int] =
     db.run(sql"""INSERT INTO dict (user_id, lang_code, key, translation)
-           VALUES (${dict.dictKey.userId}, ${dict.dictKey.langCode}, ${dict.dictKey.key}, ${dict.translation});""".update.run)
+           VALUES (${dict.dictKey.userId}, ${dict.dictKey.langCode}, ${dict.dictKey.key}, ${dict.translation})
+           ON CONFLICT (user_id, lang_code, key) DO UPDATE SET translation = ${dict.translation}
+           ;""".update.run)
 
   def delete(dictKey: DictKey): F[Int] =
     db.run(sql"""DELETE FROM dict WHERE user_id = ${dictKey.userId} AND lang_code = ${dictKey.langCode} AND key = ${dictKey.key};""".update.run)
