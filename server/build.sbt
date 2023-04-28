@@ -4,7 +4,7 @@ val doobieVersion = "1.0.0-RC2"
 
 organization := "com.mitrakoff.self"
 name := "tommylingo"
-version := "0.0.1"
+version := "1.0"
 scalaVersion := "3.2.1"
 libraryDependencies ++= Seq(
   "org.http4s"    %% "http4s-ember-server" % http4sVersion,
@@ -14,3 +14,10 @@ libraryDependencies ++= Seq(
   "org.tpolecat"  %% "doobie-postgres"     % doobieVersion, // includes org.postgresql.Driver
   "org.tpolecat"  %% "doobie-hikari"       % doobieVersion,
 )
+
+enablePlugins(JavaAppPackaging, DockerPlugin)
+
+Compile / mainClass := Some("com.mitrakoff.self.tommylingo.Main")
+Docker / packageName := "mitrakov/tommylingo"
+dockerBaseImage := "adoptopenjdk:11-jre-hotspot"
+dockerExposedPorts ++= Seq(8080)

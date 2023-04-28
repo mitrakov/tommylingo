@@ -3,6 +3,7 @@ package com.mitrakoff.self.tommylingo
 import doobie.implicits.toSqlInterpolator
 
 /*
+https://www.oracle.com/java/technologies/javase/java8locales.html
 CREATE TABLE dict (
  user_id INT NOT NULL,
  lang_code VARCHAR (8) NOT NULL,
