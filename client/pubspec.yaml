@@ -1,5 +1,6 @@
+# Built with Flutter 3.7.12
 name: tommylingo
-description: Uber project
+description: Tommylingo Mobile App
 version: 1.0.0+1
 
 environment:
@@ -12,6 +13,7 @@ dependencies:
   http: 0.13.6                # http support
   xml: 6.2.2                  # xml parsing
   tuple: 2.0.1                # tuples
+  fluttertoast: 8.2.1         # hint messages
 
 dev_dependencies:
   flutter_lints: ^2.0.0
