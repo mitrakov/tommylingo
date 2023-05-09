@@ -1,7 +1,7 @@
-# Built with Flutter 3.7.12
+# Built with Flutter 3.7.12, CocoaPods 1.11.3
 name: tommylingo
 description: Tommylingo Mobile App
-version: 1.0.0+1
+version: 23.5.9+3
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
