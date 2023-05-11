@@ -47,7 +47,7 @@ class MyModel extends Model {
       XmlElement(XmlName("translation"), [], [XmlText(translation)]),
     ])]);
 
-    final response = await http.post(Uri.parse("http://localhost:8080/lingo"), body: xml.toXmlString());
+    final response = await http.post(Uri.parse("http://mitrakoff.com:9090/lingo"), body: xml.toXmlString());
     if (response.statusCode == 200) return "";
     else return "Error: ${response.statusCode}; ${response.body}";
   }
