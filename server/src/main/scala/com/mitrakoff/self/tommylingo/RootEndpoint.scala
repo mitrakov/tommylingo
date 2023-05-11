@@ -13,13 +13,13 @@ class RootEndpoint[F[_]: Async](service: RootService[F]) extends Http4sDsl[F]:
     DictKey(1, langCode, key)
   }
 
-  given EntityDecoder[F, Dict] =
-    EntityDecoder.decodeBy(MediaType.text.xml, MediaType.text.html, MediaType.application.xml) { msg =>
-      for {
-        dictKey <- implicitly[EntityDecoder[F, DictKey]].decode(msg, strict = false)
-        translation <- xmlDecoder.map { elem => (elem \ "translation").text }.decode(msg, strict = false)
-      } yield Dict(dictKey, translation)
-    }
+  given EntityDecoder[F, Dict] = xmlDecoder map { elem =>
+    // note: do NOT reuse other decoders! "xmlDecoder.map" may be called only once!
+    val langCode = (elem \ "langCode").text
+    val key = (elem \ "key").text
+    val translation = (elem \ "translation").text
+    Dict(DictKey(1, langCode, key), translation)
+  }
 
   given keysEncoder: EntityEncoder[F, List[String]] =
     xmlEncoder contramap { list => <keys>{list map(s => {<key>{s}</key>})}</keys> }

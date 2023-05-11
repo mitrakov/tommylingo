@@ -1,21 +1,22 @@
-val http4sVersion = "0.23.13"
+val http4sVersion = "0.23.18"
+val http4sXmlVersion = "0.23.13"
 val logbackVersion = "1.4.6"
 val doobieVersion = "1.0.0-RC2"
 
 organization := "com.mitrakoff.self"
 name := "tommylingo"
-version := "1.0"
+version := "23.5.11"
 scalaVersion := "3.2.1"
 libraryDependencies ++= Seq(
   "org.http4s"    %% "http4s-ember-server" % http4sVersion,
-  "org.http4s"    %% "http4s-scala-xml"    % http4sVersion,
   "org.http4s"    %% "http4s-dsl"          % http4sVersion,
+  "org.http4s"    %% "http4s-scala-xml"    % http4sXmlVersion,
   "ch.qos.logback" % "logback-classic"     % logbackVersion,
   "org.tpolecat"  %% "doobie-postgres"     % doobieVersion, // includes org.postgresql.Driver
   "org.tpolecat"  %% "doobie-hikari"       % doobieVersion,
 )
 
-enablePlugins(JavaAppPackaging, DockerPlugin)
+enablePlugins(JavaAppPackaging)
 
 Compile / mainClass := Some("com.mitrakoff.self.tommylingo.Main")
 Docker / packageName := "mitrakov/tommylingo"
