@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:tommylingo/model.dart';
+import 'package:tommylingo/new_key.dart';
 import 'package:tommylingo/utils.dart';
 
 void main() {
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
             drawer: Drawer(
               child: Column(children: [
                 SizedBox(
-                  height: 100,
+                  height: 120,
                   width: double.infinity,
                   child: DrawerHeader(
                     decoration: const BoxDecoration(color: Colors.lightGreen),
@@ -69,9 +70,10 @@ class MyApp extends StatelessWidget {
               tooltip: "Show hint",
               child: const Icon(Icons.help_rounded),
               onPressed: () {
-                if (snapshot.hasData && snapshot.data!.item1.isNotEmpty) {
-                  Utils.showMessage(context, snapshot.data!.item2, snapshot.data!.item1);
-                }
+                // if (snapshot.hasData && snapshot.data!.item1.isNotEmpty) {
+                //   Utils.showMessage(context, snapshot.data!.item2, snapshot.data!.item1);
+                // }
+                Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey(token: snapshot.data)));
               },
             ),
           );

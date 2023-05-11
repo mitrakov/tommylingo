@@ -34,8 +34,21 @@ class MyModel extends Model {
 
   Future<Iterable<TokenPair>> _loadMore() async {
     final response = await http.get(Uri.parse("http://mitrakoff.com:9090/lingo/translations/$langCode"));
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200)
       return XmlDocument.parse(response.body).findAllElements("item").map((e) => TokenPair(e.getAttribute("key")!, e.text));
-    } else return Future.error("Error: $response");
+    else return Future.error("Error: ${response.statusCode}; ${response.body}");
+  }
+
+  /// return empty string if OK, and error in case of failure
+  Future<String> hey(String key, String translation) async {
+    final xml = XmlDocument([XmlElement(XmlName("a"), [], [
+      XmlElement(XmlName("langCode"), [], [XmlText(_langCode)]),
+      XmlElement(XmlName("key"), [], [XmlText(key)]),
+      XmlElement(XmlName("translation"), [], [XmlText(translation)]),
+    ])]);
+
+    final response = await http.post(Uri.parse("http://localhost:8080/lingo"), body: xml.toXmlString());
+    if (response.statusCode == 200) return "";
+    else return "Error: ${response.statusCode}; ${response.body}";
   }
 }
