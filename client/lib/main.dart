@@ -29,9 +29,15 @@ class MyApp extends StatelessWidget {
                     model.nextToken();
                   },
                   child: Center(
-                    child: Text(
-                      snapshot.data!.item2.isNotEmpty ? snapshot.data!.item2 : "Press ☰ and choose language...",
-                      style: Theme.of(context).textTheme.headlineSmall
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          snapshot.data!.item2.isNotEmpty ? snapshot.data!.item2 : "Press ☰ and choose language...",
+                          style: Theme.of(context).textTheme.headlineSmall
+                        ),
+                        const SizedBox(height: 120) // to make a text a bit higher
+                      ],
                     ),
                   ),
                 )
@@ -66,15 +72,48 @@ class MyApp extends StatelessWidget {
                 ),
               ]),
             ),
-            floatingActionButton: FloatingActionButton(
-              tooltip: "Show hint",
-              child: const Icon(Icons.help_rounded),
-              onPressed: () {
-                // if (snapshot.hasData && snapshot.data!.item1.isNotEmpty) {
-                //   Utils.showMessage(context, snapshot.data!.item2, snapshot.data!.item1);
-                // }
-                Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey(token: snapshot.data)));
-              },
+            floatingActionButton: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  heroTag: "showHint", // must be present for multiple FA Buttons (https://stackoverflow.com/questions/51125024)
+                  tooltip: "Show hint",
+                  child: const Icon(Icons.help_rounded),
+                  onPressed: () {
+                    if (snapshot.hasData && snapshot.data!.item1.isNotEmpty) {
+                      Utils.showMessage(context, snapshot.data!.item2, snapshot.data!.item1);
+                    }
+                  },
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton(
+                  heroTag: "add",
+                  tooltip: "Add translation key",
+                  child: const Icon(Icons.add_circle_rounded),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey()));
+                  },
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton(
+                  heroTag: "edit",
+                  tooltip: "Edit translation key",
+                  child: const Icon(Icons.edit_rounded),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey(token: snapshot.data)));
+                  },
+                ),
+                const SizedBox(height: 10),
+                FloatingActionButton(
+                  heroTag: "delete",
+                  tooltip: "Delete translation key",
+                  child: const Icon(Icons.delete_forever_rounded),
+                  onPressed: () {
+                    print("TODO");
+                  },
+                )
+              ],
             ),
           );
         });

@@ -39,8 +39,8 @@ class MyModel extends Model {
     else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 
-  /// return empty string if OK, and error in case of failure
-  Future<String> hey(String key, String translation) async {
+  /// returns empty string if OK, or error message in case of failure
+  Future<String> upsertTranslation(String key, String translation) async {
     final xml = XmlDocument([XmlElement(XmlName("a"), [], [
       XmlElement(XmlName("langCode"), [], [XmlText(_langCode)]),
       XmlElement(XmlName("key"), [], [XmlText(key)]),
