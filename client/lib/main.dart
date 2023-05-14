@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
                     ),
                   ),
                 )
-              : const RefreshProgressIndicator(),
+              : const Center(child: RefreshProgressIndicator()),
             drawer: Drawer(
               child: Column(children: [
                 SizedBox(
@@ -79,6 +79,7 @@ class MyApp extends StatelessWidget {
                 FloatingActionButton(
                   heroTag: "showHint", // must be present for multiple FA Buttons (https://stackoverflow.com/questions/51125024)
                   tooltip: "Show hint",
+                  backgroundColor: Colors.lightBlue,
                   child: const Icon(Icons.help_rounded),
                   onPressed: () {
                     if (snapshot.hasData && snapshot.data!.item1.isNotEmpty) {
@@ -90,27 +91,32 @@ class MyApp extends StatelessWidget {
                 FloatingActionButton(
                   heroTag: "add",
                   tooltip: "Add translation key",
+                  backgroundColor: Colors.deepPurpleAccent,
                   child: const Icon(Icons.add_circle_rounded),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey()));
-                  },
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey())),
                 ),
                 const SizedBox(height: 10),
                 FloatingActionButton(
                   heroTag: "edit",
                   tooltip: "Edit translation key",
+                  backgroundColor: Colors.brown,
                   child: const Icon(Icons.edit_rounded),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey(token: snapshot.data)));
-                  },
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewKey(token: snapshot.data))),
                 ),
                 const SizedBox(height: 10),
                 FloatingActionButton(
                   heroTag: "delete",
                   tooltip: "Delete translation key",
+                  backgroundColor: Colors.red,
                   child: const Icon(Icons.delete_forever_rounded),
                   onPressed: () {
-                    print("TODO");
+                    if (snapshot.hasData && snapshot.data!.item1.isNotEmpty) {
+                      Utils.showYesNoDialog(context, "Delete translation", "Are you sure you want to remove '${snapshot.data!.item1}'?", () async {
+                        final error = await model.deleteTranslation(snapshot.data!.item1);
+                        Fluttertoast.showToast(msg: error.isEmpty ? "Deleted!" : error, gravity: ToastGravity.BOTTOM, backgroundColor: error.isEmpty ? Colors.green : Colors.red);
+                        if (error.isEmpty) model.nextToken();
+                      });
+                    }
                   },
                 )
               ],

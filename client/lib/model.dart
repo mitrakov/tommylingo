@@ -51,4 +51,16 @@ class MyModel extends Model {
     if (response.statusCode == 200) return "";
     else return "Error: ${response.statusCode}; ${response.body}";
   }
+
+  /// returns empty string if OK, or error message in case of failure
+  Future<String> deleteTranslation(String key) async {
+    final xml = XmlDocument([XmlElement(XmlName("a"), [], [
+      XmlElement(XmlName("langCode"), [], [XmlText(_langCode)]),
+      XmlElement(XmlName("key"), [], [XmlText(key)]),
+    ])]);
+
+    final response = await http.delete(Uri.parse("http://mitrakoff.com:9090/lingo"), body: xml.toXmlString());
+    if (response.statusCode == 200) return "";
+    else return "Error: ${response.statusCode}; ${response.body}";
+  }
 }
