@@ -8,12 +8,14 @@ typedef TokenPair = Tuple2<String, String>;
 
 class MyModel extends Model {
   final List<TokenPair> _data = [];
+  final List<String> _keys = [];
   String _langCode = "en-GB";
   int _currentToken = 0;
 
   Future<TokenPair> get token async {
     if (_currentToken >= _data.length) { // IF data is empty OR _currentToken is overflown
       _data..clear()..addAll(await _loadMore());
+      _keys..clear()..addAll(await _loadKeys());
       _currentToken = 0;
     }
     return _data.isEmpty ? const TokenPair("", "") : _data[_currentToken];
@@ -25,10 +27,12 @@ class MyModel extends Model {
   }
 
   String get langCode => _langCode;
+  List<String> get keys => _keys;
 
   set langCode(String value) {
     _langCode = value;
     _data.clear();
+    _keys.clear();
     notifyListeners();
   }
 
@@ -36,6 +40,13 @@ class MyModel extends Model {
     final response = await http.get(Uri.parse("http://mitrakoff.com:9090/lingo/translations/$langCode"));
     if (response.statusCode == 200)
       return XmlDocument.parse(response.body).findAllElements("item").map((e) => TokenPair(e.getAttribute("key")!, e.text));
+    else return Future.error("Error: ${response.statusCode}; ${response.body}");
+  }
+
+  Future<Iterable<String>> _loadKeys() async {
+    final response = await http.get(Uri.parse("http://mitrakoff.com:9090/lingo/keys/$langCode"));
+    if (response.statusCode == 200)
+      return XmlDocument.parse(response.body).findAllElements("key").map((e) => e.text);
     else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 

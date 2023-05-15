@@ -1,5 +1,6 @@
 // ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'model.dart';
@@ -26,9 +27,19 @@ class NewKey extends StatelessWidget {
           child: Column(
             children: [
               const SizedBox(height: 10),
-              TextField(controller: keyController, decoration: const InputDecoration(labelText: "Key")),
-              const SizedBox(height: 10),
-              TextField(controller: translationController, decoration: const InputDecoration(labelText: "Translation")),
+              TypeAheadField<String>(
+                textFieldConfiguration: TextFieldConfiguration(controller: keyController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Key")),
+                suggestionsCallback: (prefix) {
+                  final list = List<String>.from(model.keys);
+                  list.retainWhere((s) => s.toLowerCase().contains(prefix.toLowerCase()));
+                  return list;
+                },
+                itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
+                onSuggestionSelected: (newValue) => keyController.text = newValue,
+                hideOnEmpty: true,
+              ),
+              const SizedBox(height: 20),
+              TextField(controller: translationController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Translation")),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () async {
