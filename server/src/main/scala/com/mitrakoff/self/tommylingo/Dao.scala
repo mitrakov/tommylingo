@@ -5,7 +5,7 @@ import doobie.implicits.toSqlInterpolator
 
 /*
 https://www.oracle.com/java/technologies/javase/java8locales.html
-CREATE TABLE dict (
+CREATE TABLE lingo.dict (
  user_id INT NOT NULL,
  lang_code VARCHAR (8) NOT NULL,
  key VARCHAR (128) NOT NULL,
