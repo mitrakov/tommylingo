@@ -1,5 +1,6 @@
 package com.mitrakoff.self.tommylingo
 
+import com.mitrakoff.self.Db
 import doobie.implicits.toSqlInterpolator
 
 /*
