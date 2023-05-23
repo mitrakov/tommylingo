@@ -2,11 +2,11 @@ package com.mitrakoff.self.tommylingo
 
 import cats.effect.Async
 import cats.implicits.{toFlatMapOps, catsSyntaxApply}
-import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes, MediaType}
+import org.http4s.{EntityDecoder, EntityEncoder, HttpRoutes}
 import org.http4s.dsl.Http4sDsl
 import org.http4s.scalaxml.{xmlDecoder, xmlEncoder}
 
-class RootEndpoint[F[_]: Async](service: RootService[F]) extends Http4sDsl[F]:
+class LingoRoutes[F[_]: Async](service: LingoService[F]) extends Http4sDsl[F]:
   given EntityDecoder[F, DictKey] = xmlDecoder map { elem =>
     val langCode = (elem \ "langCode").text
     val key = (elem \ "key").text

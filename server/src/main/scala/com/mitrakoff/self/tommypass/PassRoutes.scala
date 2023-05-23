@@ -1,17 +1,17 @@
 package com.mitrakoff.self.tommypass
 
 import cats.data.{Kleisli, OptionT}
-import cats.effect.{Async, Concurrent, Sync}
-import cats.{Applicative, Monad}
+import cats.effect.Concurrent
+import cats.Applicative
 import com.mitrakoff.self.AuthService
 import com.mitrakoff.self.tommypass.PassItem
-import org.http4s.circe.*
+import org.http4s.circe.jsonOf
 import org.http4s.dsl.Http4sDsl
 import org.http4s.headers.Authorization
 import org.http4s.server.AuthMiddleware
-import org.http4s.{AuthedRequest, AuthedRoutes, EntityDecoder, HttpRoutes, Request, Response}
+import org.http4s.{AuthedRoutes, EntityDecoder, HttpRoutes, Request}
 
-class TommyPassRoutes[F[_]: Concurrent](authService: AuthService[F]) extends Http4sDsl[F]:
+class PassRoutes[F[_]: Concurrent](authService: AuthService[F]) extends Http4sDsl[F]:
   given EntityDecoder[F, PassItem] = jsonOf[F, PassItem]
 
   def routes: HttpRoutes[F] = {
@@ -24,10 +24,10 @@ class TommyPassRoutes[F[_]: Concurrent](authService: AuthService[F]) extends Htt
         token <- request.headers.get[Authorization].map(_.value.toLowerCase.replace("bearer ", "")).toRight(s"Authorization header not found")
         result <- authService.isTokenValid(token)
       } yield result
-      implicitly[Applicative[F]].pure(either) // we must wrap it into effect F for possible changes that might require IO operations
+      implicitly[Applicative[F]].pure(either)
     }
 
-    AuthMiddleware(authUser, onFailure).apply(AuthedRoutes.of[Long, F] {
+    AuthMiddleware(authUser, onFailure).apply(AuthedRoutes.of {
       case GET -> Root / "pass" / key as userId =>
         Ok(s"$key: $userId")
       case req@POST -> Root / "pass" as userId =>

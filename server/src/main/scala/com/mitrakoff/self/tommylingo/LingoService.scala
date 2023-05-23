@@ -1,6 +1,6 @@
 package com.mitrakoff.self.tommylingo
 
-class RootService[F[_]](dao: Dao[F]) {
+class LingoService[F[_]](dao: Dao[F]) {
   def getAllKeys(userId: Int, langCode: String): F[List[String]] = dao.fetchAllKeys(userId, langCode)
 
   def getTranslations(userId: Int, langCode: String): F[List[(String, String)]] = dao.fetchWithLimit(userId, langCode, 25)
