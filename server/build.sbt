@@ -5,8 +5,8 @@ val doobieVersion = "1.0.0-RC2"
 val circeVersion = "0.14.5"
 
 organization := "com.mitrakoff.self"
-name := "tommylingo"
-version := "23.5.11"
+name := "tommyserver"
+version := "23.5.24"
 scalaVersion := "3.2.1"
 libraryDependencies ++= Seq(
   "org.http4s"    %% "http4s-ember-server" % http4sVersion,
@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
 
 enablePlugins(JavaAppPackaging)
 
-Compile / mainClass := Some("com.mitrakoff.self.tommylingo.Main")
-Docker / packageName := "mitrakov/tommylingo"
+Compile / mainClass := Some("com.mitrakoff.self.Main")
+Docker / packageName := "mitrakov/tommy-server"
 dockerBaseImage := "adoptopenjdk:11-jre-hotspot"
 dockerExposedPorts ++= Seq(8080)
