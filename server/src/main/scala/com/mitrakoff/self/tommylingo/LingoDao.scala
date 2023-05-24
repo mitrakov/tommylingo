@@ -16,7 +16,7 @@ CREATE TABLE lingo.dict (
 );
 */
 
-class Dao[F[_]](db: Db[F]):
+class LingoDao[F[_]](db: Db[F]):
   def fetchWithLimit(userId: Int, langCode: String, limit: Int): F[List[(String, String)]] =
     db.run(sql"""SELECT key, translation FROM lingo.dict WHERE user_id = $userId AND lang_code = $langCode ORDER BY random() LIMIT $limit;""".query[(String, String)].to[List])
 
@@ -29,5 +29,5 @@ class Dao[F[_]](db: Db[F]):
            ON CONFLICT (user_id, lang_code, key) DO UPDATE SET translation = ${dict.translation}
            ;""".update.run)
 
-  def delete(dictKey: DictKey): F[Int] =
+  def delete(dictKey: DictKey): F[Int] = // TODO: make remove by PK!
     db.run(sql"""DELETE FROM lingo.dict WHERE user_id = ${dictKey.userId} AND lang_code = ${dictKey.langCode} AND key = ${dictKey.key};""".update.run)

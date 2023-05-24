@@ -17,9 +17,9 @@ CREATE TABLE pass.main (
 CREATE UNIQUE INDEX main_uk ON pass.main (user_id, resource, login);
 */
 
-class Dao[F[_]](db: Db[F]):
-  def fetchWithLimit(userId: Int, langCode: String, limit: Int): F[List[(String, String)]] =
-    db.run(sql"""SELECT key, translation FROM lingo.dict WHERE user_id = $userId AND lang_code = $langCode ORDER BY random() LIMIT $limit;""".query[(String, String)].to[List])
+class PassDao[F[_]](db: Db[F]):
+  def fetchAllResources(userId: Int): F[List[String]] =
+    db.run(sql"""SELECT resource FROM pass.main WHERE user_id = $userId;""".query[String].to[List])
 
 //  def fetchAllKeys(userId: Int, langCode: String): F[List[String]] =
 //    db.run(sql"""SELECT key FROM lingo.dict WHERE user_id = $userId AND lang_code = $langCode;""".query[String].to[List])

@@ -2,8 +2,8 @@ package com.mitrakoff.self
 
 import cats.effect.{Async, IO, IOApp, Resource}
 import com.comcast.ip4s.{ipv4, port}
-import com.mitrakoff.self.tommylingo.{Dao, LingoService, LingoRoutes}
-import com.mitrakoff.self.tommypass.PassRoutes
+import com.mitrakoff.self.tommylingo.{LingoDao, LingoRoutes, LingoService}
+import com.mitrakoff.self.tommypass.{PassDao, PassRoutes, PassService}
 import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import org.http4s.HttpApp
@@ -15,13 +15,15 @@ object Main extends IOApp.Simple:
 
   private def run[F[_] : Async]: F[Nothing] = {
     import cats.implicits.toSemigroupKOps
+    val authService: AuthService[F] = AuthService()
     createTransactor() use { tx =>
       val db: Db[F] = Db(tx)
-      val dao: Dao[F] = Dao(db)
-      val authService: AuthService[F] = new AuthService()
-      val lingoService: LingoService[F] = LingoService(dao)
+      val lingoDao: LingoDao[F] = LingoDao(db)
+      val passDao: PassDao[F] = PassDao(db)
+      val lingoService: LingoService[F] = LingoService(lingoDao)
+      val passService: PassService[F] = PassService(passDao)
       val lingoRoutes: LingoRoutes[F] = LingoRoutes(lingoService)
-      val passRoutes: PassRoutes[F] = PassRoutes(authService)
+      val passRoutes: PassRoutes[F] = PassRoutes(authService, passService)
       val httpApp: HttpApp[F] = (lingoRoutes.routes <+> passRoutes.routes).orNotFound
       val finalHttpApp: HttpApp[F] = Logger.httpApp(logHeaders = true, logBody = true)(httpApp)
 
