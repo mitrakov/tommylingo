@@ -1,70 +1,67 @@
+// ignore_for_file: use_key_in_widget_constructors
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:tommypass/model.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ScopedModel(model: PassModel(), child: TommyPassMain()));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class TommyPassMain extends StatefulWidget {
+  @override
+  State<TommyPassMain> createState() => _TommyPassMainState();
+}
 
-  // This widget is the root of your application.
+class _TommyPassMainState extends State<TommyPassMain> {
+  final TextEditingController searchCtrl = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  PassModel model = new PassModel();
-
-  void _incrementCounter() {
-    setState(() {
-      model.resources;
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+      title: "TommyPass",
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: Scaffold(
+        appBar: AppBar(title: const Text("TommyPass")),
+        body: ScopedModelDescendant<PassModel>(builder: (context, child, model) {
+          return Center(
+            child: Builder(builder: (context) {
+              final data = model.resources;
+              return data.isNotEmpty
+                ? Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    TypeAheadField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: searchCtrl,
+                        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Search")
+                      ),
+                      suggestionsCallback: (prefix) {
+                        final list = data.toList();
+                        list.retainWhere((s) => s.toLowerCase().contains(prefix.toLowerCase()));
+                        return list;
+                      },
+                      itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
+                      onSuggestionSelected: (s) => setState(() {
+                        model.loadResource(s);
+                        searchCtrl.text = s;
+                      }),
+                    ),
+                    Text(searchCtrl.text, style: Theme.of(context).textTheme.headlineMedium),
+                    Text(model.currentLogin),
+                    Text(model.currentPassword),
+                    Text(model.currentNote),
+                  ],
+                )
+                : const RefreshProgressIndicator();
+            }),
+          );
+        }),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => print("Hey"),
+          tooltip: 'Add new',
+          child: const Icon(Icons.add),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
       ),
     );
   }
