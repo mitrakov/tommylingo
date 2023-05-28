@@ -12,9 +12,9 @@ import org.http4s.server.AuthMiddleware
 import org.http4s.{AuthedRoutes, EntityDecoder, EntityEncoder, HttpRoutes, Request}
 
 class PassRoutes[F[_]: Concurrent](authService: AuthService[F], passService: PassService[F]) extends Http4sDsl[F]:
-  //given EntityDecoder[F, PassItem] = jsonOf[F, PassItem]
   given EntityEncoder[F, ResourcesList] = jsonEncoderOf[F, ResourcesList]
   given EntityEncoder[F, PassItem] = jsonEncoderOf[F, PassItem]
+  given EntityDecoder[F, PassItem] = jsonOf[F, PassItem]
 
   def routes: HttpRoutes[F] = {
     import cats.implicits.{toFlatMapOps, toFunctorOps}
@@ -42,12 +42,13 @@ class PassRoutes[F[_]: Concurrent](authService: AuthService[F], passService: Pas
             case Some(item) => Ok(item)
             case None => NotFound("Resource not found")
         } yield response
-//      case req@POST -> Root / "pass" as userId =>
-//        for {
-//          data <- req.req.as[PassItem]
-//          response <- Ok(data.login)
-//        } yield response
-      case PUT    -> Root / "pass" as userId => Ok(s"key: userId")
-      case DELETE -> Root / "pass" as userId => Ok(s"key: userId")
+      case req@POST -> Root / "pass" as userId =>
+        for {
+          item <- req.req.as[PassItem]
+          rows <- passService.addNewResource(userId, item)
+          response <- Ok(s"$rows row(s) added")
+        } yield response
+      case PUT    -> Root / "pass" as userId => Ok(s"PUT: $userId")
+      case DELETE -> Root / "pass" as userId => Ok(s"DEL: $userId")
     })
   }

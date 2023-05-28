@@ -23,3 +23,8 @@ class PassDao[F[_]](db: Db[F]):
 
   def fetchResource(userId: Int, resource: String): F[Option[PassItem]] =
     db.run(sql"""SELECT id, resource, login, password, note FROM pass.main WHERE user_id = $userId AND resource = $resource;""".query[PassItem].option)
+
+  def newResource(userId: Int, item: PassItem): F[Int] =
+    db.run(
+      sql"""INSERT INTO pass.main (user_id, resource, login, password, note) VALUES ($userId, ${item.resource}, ${item.login}, ${item.password}, ${item.note});""".update.run
+    )

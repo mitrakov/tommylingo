@@ -7,4 +7,5 @@ class PassService[F[_]: Functor](dao: PassDao[F]) {
 
   def getAllResources(userId: Int): F[ResourcesList] = dao.fetchAllResources(userId) map ResourcesList.apply
   def getResource(userId: Int, resource: String): F[Option[PassItem]] = dao.fetchResource(userId, resource)
+  def addNewResource(userId: Int, item: PassItem): F[Int] = dao.newResource(userId, item)
 }
