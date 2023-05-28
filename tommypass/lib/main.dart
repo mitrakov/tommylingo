@@ -24,37 +24,35 @@ class _TommyPassMainState extends State<TommyPassMain> {
       home: Scaffold(
         appBar: AppBar(title: const Text("TommyPass")),
         body: ScopedModelDescendant<PassModel>(builder: (context, child, model) {
+          final data = model.resources;
           return Center(
-            child: Builder(builder: (context) {
-              final data = model.resources;
-              return data.isNotEmpty
-                ? Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    TypeAheadField(
-                      textFieldConfiguration: TextFieldConfiguration(
-                        controller: searchCtrl,
-                        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Search")
-                      ),
-                      suggestionsCallback: (prefix) {
-                        final list = data.toList();
-                        list.retainWhere((s) => s.toLowerCase().contains(prefix.toLowerCase()));
-                        return list;
-                      },
-                      itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
-                      onSuggestionSelected: (s) => setState(() {
-                        model.loadResource(s);
-                        searchCtrl.text = s;
-                      }),
+            child: data.isNotEmpty
+              ? Column(
+                children: [
+                  const SizedBox(height: 10),
+                  TypeAheadField(
+                    textFieldConfiguration: TextFieldConfiguration(
+                      controller: searchCtrl,
+                      decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Search")
                     ),
-                    Text(searchCtrl.text, style: Theme.of(context).textTheme.headlineMedium),
-                    Text(model.currentLogin),
-                    Text(model.currentPassword),
-                    Text(model.currentNote),
-                  ],
-                )
-                : const RefreshProgressIndicator();
-            }),
+                    suggestionsCallback: (prefix) {
+                      final list = data.toList();
+                      list.retainWhere((s) => s.toLowerCase().contains(prefix.toLowerCase()));
+                      return list;
+                    },
+                    itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
+                    onSuggestionSelected: (s) => setState(() {
+                      model.loadResource(s);
+                      searchCtrl.text = s;
+                    }),
+                  ),
+                  Text(searchCtrl.text, style: Theme.of(context).textTheme.headlineMedium),
+                  Text(model.currentLogin),
+                  Text(model.currentPassword),
+                  Text(model.currentNote),
+                ],
+              )
+              : const RefreshProgressIndicator()
           );
         }),
         floatingActionButton: FloatingActionButton(
