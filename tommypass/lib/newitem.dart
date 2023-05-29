@@ -1,13 +1,11 @@
-// ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors
-import 'dart:io';
-
+// ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors, curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:tommypass/item/passitem.dart';
 import 'package:tommypass/model.dart';
 
-class NewCredentials extends StatelessWidget {
+class NewItemWidget extends StatelessWidget {
   final TextEditingController resourceCtrl = TextEditingController();
   final TextEditingController userNameCtrl = TextEditingController();
   final TextEditingController passwordCtrl = TextEditingController();
@@ -26,19 +24,7 @@ class NewCredentials extends StatelessWidget {
               TextField(controller: passwordCtrl, decoration: const InputDecoration(border: UnderlineInputBorder(), labelText: "Password")),
               TextField(controller: optNoteCtrl,  decoration: const InputDecoration(border: UnderlineInputBorder(), labelText: "Note (optional)")),
               ElevatedButton(
-                onPressed: () async {
-                  final resource = resourceCtrl.text;
-                  final login = userNameCtrl.text;
-                  final password = passwordCtrl.text;
-                  final note = optNoteCtrl.text.isNotEmpty ? optNoteCtrl.text : null;
-                  if (resource.isNotEmpty && login.isNotEmpty && password.isNotEmpty) {
-                    final item = PassItem(0, resource, login, password, note);
-                    await model.addNewItem(item);
-                    if (Platform.isAndroid || Platform.isIOS) // TODO: check cross-platform plugins!
-                      Fluttertoast.showToast(msg: "Done!", gravity: ToastGravity.BOTTOM, backgroundColor: Colors.greenAccent);
-                    Navigator.pop(context);
-                  }
-                },
+                onPressed: () => _onOkPressed(context, model),
                 child: const Text("OK")
               ),
             ],
@@ -46,5 +32,19 @@ class NewCredentials extends StatelessWidget {
         ),
       );
     });
+  }
+
+  void _onOkPressed(BuildContext context, PassModel model) async {
+    final resource = resourceCtrl.text;
+    final login = userNameCtrl.text;
+    final password = passwordCtrl.text;
+    final note = optNoteCtrl.text.isNotEmpty ? optNoteCtrl.text : null;
+    if (resource.isNotEmpty && login.isNotEmpty && password.isNotEmpty) {
+      final item = PassItem(0, resource, login, password, note);
+      final error = await model.addNewItem(item);
+      BotToast.showText(text: error.isEmpty ? "Done!" : error, duration: const Duration(seconds: 3), contentColor: error.isEmpty ? Colors.green[400]! : Colors.red[400]!);
+      if (error.isEmpty)
+        Navigator.pop(context);
+    }
   }
 }

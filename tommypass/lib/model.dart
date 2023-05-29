@@ -14,7 +14,6 @@ class PassModel extends Model {
 
   Iterable<String> get resources {
     if (_resources.isEmpty) _loadMore();
-    //return _data.keys;
     return _resources;
   }
 
@@ -33,11 +32,13 @@ class PassModel extends Model {
     } else print("Error loading a resource: ${response.body}");
   }
 
-  Future addNewItem(PassItem item) async {
+  /// return Error message, or empty string if everything is OK
+  Future<String> addNewItem(PassItem item) async {
     final response = await http.post(Uri.parse("http://mitrakoff.com:9090/pass"), headers: {"Authorization": "Bearer $token"}, body: json.encode(item.toJson()));
     if (response.statusCode == 200) {
-      _loadMore(); // refresh
-    } else print("Error adding a new item: ${response.body}");
+      await _loadMore(); // refresh
+      return "";
+    } else return "Error adding a new item: ${response.body}";
   }
 
   Future _loadMore() async {

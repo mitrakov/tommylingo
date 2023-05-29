@@ -2,8 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:tommypass/model.dart';
-import 'package:tommypass/new_creds.dart';
+import 'package:tommypass/newitem.dart';
 
 void main() {
   runApp(ScopedModel(model: PassModel(), child: TommyPassMain()));
@@ -22,6 +23,7 @@ class _TommyPassMainState extends State<TommyPassMain> {
     return MaterialApp(
       title: "TommyPass",
       theme: ThemeData(primarySwatch: Colors.red),
+      builder: BotToastInit(),
       home: Scaffold(
         appBar: AppBar(title: const Text("TommyPass")),
         body: ScopedModelDescendant<PassModel>(builder: (context, child, model) {
@@ -58,7 +60,7 @@ class _TommyPassMainState extends State<TommyPassMain> {
         }),
         floatingActionButton: Builder(builder: (context) { // Navigator.push(context, ...) should take a separate context
           return FloatingActionButton(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewCredentials())),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewItemWidget())),
             tooltip: 'Add new',
             child: const Icon(Icons.add),
           );
