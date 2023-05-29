@@ -6,7 +6,7 @@ import 'package:tommypass/item/passitem.dart';
 import 'package:tommypass/item/resources.dart';
 
 class PassModel extends Model {
-  //final Map<String, PassItem> _data = {};
+  final String token = "555";
   final List<String> _resources = [];
   String _currentLogin = "";
   String _currentPassword = "";
@@ -23,7 +23,7 @@ class PassModel extends Model {
   String get currentNote => _currentNote;
 
   void loadResource(String resource) async {
-    final response = await http.get(Uri.parse("http://mitrakoff.com:9090/pass/$resource"), headers: {"Authorization": "Bearer 555"});
+    final response = await http.get(Uri.parse("http://mitrakoff.com:9090/pass/$resource"), headers: {"Authorization": "Bearer $token"});
     if (response.statusCode == 200) {
       final item = PassItem.fromJson(json.decode(response.body));
       _currentLogin = item.login;
@@ -33,8 +33,15 @@ class PassModel extends Model {
     } else print("Error loading a resource: ${response.body}");
   }
 
+  Future addNewItem(PassItem item) async {
+    final response = await http.post(Uri.parse("http://mitrakoff.com:9090/pass"), headers: {"Authorization": "Bearer $token"}, body: json.encode(item.toJson()));
+    if (response.statusCode == 200) {
+      _loadMore(); // refresh
+    } else print("Error adding a new item: ${response.body}");
+  }
+
   Future _loadMore() async {
-    final response = await http.get(Uri.parse("http://mitrakoff.com:9090/pass/resources"), headers: {"Authorization": "Bearer 555"});
+    final response = await http.get(Uri.parse("http://mitrakoff.com:9090/pass/resources"), headers: {"Authorization": "Bearer $token"});
     if (response.statusCode == 200) {
       final resources = Resources.fromJson(json.decode(response.body));
       _resources..clear()..addAll(resources.resources);

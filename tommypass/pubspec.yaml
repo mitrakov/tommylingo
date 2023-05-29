@@ -12,6 +12,7 @@ dependencies:
   scoped_model: 2.0.0         # state management
   http: 0.13.6                # http support
   json_annotation: 4.8.1      # json auto-generation
+  fluttertoast: 8.2.1         # hint messages
   flutter_typeahead: 4.3.8    # text field with suggestions
 
 dev_dependencies:

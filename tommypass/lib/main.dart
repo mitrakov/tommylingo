@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:tommypass/model.dart';
+import 'package:tommypass/new_creds.dart';
 
 void main() {
   runApp(ScopedModel(model: PassModel(), child: TommyPassMain()));
@@ -55,11 +56,13 @@ class _TommyPassMainState extends State<TommyPassMain> {
               : const RefreshProgressIndicator()
           );
         }),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => print("Hey"),
-          tooltip: 'Add new',
-          child: const Icon(Icons.add),
-        ),
+        floatingActionButton: Builder(builder: (context) { // Navigator.push(context, ...) should take a separate context
+          return FloatingActionButton(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewCredentials())),
+            tooltip: 'Add new',
+            child: const Icon(Icons.add),
+          );
+        }),
       ),
     );
   }
