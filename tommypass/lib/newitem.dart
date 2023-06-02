@@ -35,10 +35,10 @@ class NewItemWidget extends StatelessWidget {
   }
 
   void _onOkPressed(BuildContext context, PassModel model) async {
-    final resource = resourceCtrl.text;
-    final login = userNameCtrl.text;
-    final password = passwordCtrl.text;
-    final note = optNoteCtrl.text.isNotEmpty ? optNoteCtrl.text : null;
+    final resource = resourceCtrl.text.trim();
+    final login = userNameCtrl.text.trim();
+    final password = passwordCtrl.text.trim();
+    final note = optNoteCtrl.text.isNotEmpty ? optNoteCtrl.text.trim() : null;
     if (resource.isNotEmpty && login.isNotEmpty && password.isNotEmpty) {
       final item = PassItem(0, resource, login, password, note);
       final error = await model.addNewItem(item);

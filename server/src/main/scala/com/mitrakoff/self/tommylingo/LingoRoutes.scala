@@ -8,16 +8,16 @@ import org.http4s.scalaxml.{xmlDecoder, xmlEncoder}
 
 class LingoRoutes[F[_]: Async](service: LingoService[F]) extends Http4sDsl[F]:
   given EntityDecoder[F, DictKey] = xmlDecoder map { elem =>
-    val langCode = (elem \ "langCode").text
-    val key = (elem \ "key").text
+    val langCode = (elem \ "langCode").text.trim
+    val key = (elem \ "key").text.trim
     DictKey(1, langCode, key)
   }
 
   given EntityDecoder[F, Dict] = xmlDecoder map { elem =>
     // note: do NOT reuse other decoders! "xmlDecoder.map" may be called only once!
-    val langCode = (elem \ "langCode").text
-    val key = (elem \ "key").text
-    val translation = (elem \ "translation").text
+    val langCode = (elem \ "langCode").text.trim
+    val key = (elem \ "key").text.trim
+    val translation = (elem \ "translation").text.trim
     Dict(DictKey(1, langCode, key), translation)
   }
 
