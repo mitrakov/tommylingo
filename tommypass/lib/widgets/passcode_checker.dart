@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, curly_braces_in_flow_control_structures, use_build_context_synchronously
+// ignore_for_file: use_key_in_widget_constructors, curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,7 +18,6 @@ class PasscodeCheckerState extends State<PasscodeChecker> {
     SharedPreferences.getInstance().then((storage) {
       if (storage.containsKey("passcode"))
         curPasscodeCtrl.text = storage.getString("passcode") ?? "";
-      //else Future.delayed(const Duration(seconds: 0), () => Navigator.popAndPushNamed(context, "/setPasscode"));
       else Navigator.popAndPushNamed(context, "/setPasscode");
     });
   }

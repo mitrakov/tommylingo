@@ -10,7 +10,7 @@ class PasscodeSetter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(body: Center(child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
+      children: [
         TextField(
           controller: ctrl1,
           obscureText: true,
@@ -29,8 +29,7 @@ class PasscodeSetter extends StatelessWidget {
             if (ctrl1.text.isEmpty || ctrl2.text.isEmpty)
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Empty passcode!")));
             else if (ctrl1.text == ctrl2.text) {
-              final storage = await SharedPreferences.getInstance();
-              storage.setString("passcode", ctrl1.text).then((value) => Navigator.popAndPushNamed(context, "/main"));
+              SharedPreferences.getInstance().then((storage) => storage.setString("passcode", ctrl1.text).then((_) => Navigator.popAndPushNamed(context, "/main")));
             } else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Passcode fields differ!")));
           },
         ),

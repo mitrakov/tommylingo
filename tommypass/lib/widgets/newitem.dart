@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, use_key_in_widget_constructors, curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:bot_toast/bot_toast.dart';
 import 'package:tommypass/item/passitem.dart';
 import 'package:tommypass/model.dart';
 
@@ -42,7 +41,8 @@ class NewItemWidget extends StatelessWidget {
     if (resource.isNotEmpty && login.isNotEmpty && password.isNotEmpty) {
       final item = PassItem(0, resource, login, password, note);
       final error = await model.addNewItem(item);
-      BotToast.showText(text: error.isEmpty ? "Done!" : error, duration: const Duration(seconds: 3), contentColor: error.isEmpty ? Colors.green[400]! : Colors.red[400]!);
+      final bar = SnackBar(content: Text(error.isEmpty ? "Done!" : error), duration: const Duration(seconds: 3), backgroundColor: error.isEmpty ? Colors.green[400] : Colors.red[400]);
+      ScaffoldMessenger.of(context).showSnackBar(bar);
       if (error.isEmpty)
         Navigator.pop(context);
     }

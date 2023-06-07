@@ -1,7 +1,6 @@
 // ignore_for_file: use_key_in_widget_constructors
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:bot_toast/bot_toast.dart';
 import 'package:tommypass/model.dart';
 import 'package:tommypass/widgets/newitem.dart';
 import 'package:tommypass/widgets/passcode_checker.dart';
@@ -18,7 +17,6 @@ class TommyPassMain extends StatelessWidget {
     return MaterialApp(
       title: "TommyPass",
       theme: ThemeData(primarySwatch: Colors.red),
-      builder: BotToastInit(),
       initialRoute: "/checkPasscode",
       routes: {
         "/checkPasscode": (c) => PasscodeChecker(),
