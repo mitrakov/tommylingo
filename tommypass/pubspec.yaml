@@ -1,7 +1,7 @@
 # Build with Flutter 3.7.12, CocoaPods 1.11.3
 name: tommypass
 description: Mobile App for TommyPass
-version: 23.5.26+1            # by calver.org; before build set up the auth token!
+version: 23.6.7+2            # by calver.org; before build set up the auth token!
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
