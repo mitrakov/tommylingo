@@ -1,7 +1,6 @@
 // ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'model.dart';
 
@@ -47,7 +46,8 @@ class NewKey extends StatelessWidget {
                   final translation = translationController.text;
                   if (key.isNotEmpty && translation.isNotEmpty) {
                     final error = await model.upsertTranslation(key, translation);
-                    Fluttertoast.showToast(msg: error.isEmpty ? "Success!" : error, gravity: ToastGravity.BOTTOM, backgroundColor: error.isEmpty ? Colors.green : Colors.red);
+                    final bar = SnackBar(content: Text(error.isEmpty ? "Success!" : error), duration: const Duration(seconds: 3), backgroundColor: error.isEmpty ? Colors.green : Colors.red);
+                    ScaffoldMessenger.of(context).showSnackBar(bar);
                     if (error.isEmpty) Navigator.pop(context);
                   }
                 },

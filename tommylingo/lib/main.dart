@@ -1,6 +1,5 @@
-// ignore_for_file: use_key_in_widget_constructors
+// ignore_for_file: use_key_in_widget_constructors, use_build_context_synchronously, curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:tommylingo/model.dart';
 import 'package:tommylingo/new_key.dart';
@@ -23,9 +22,8 @@ class MyApp extends StatelessWidget {
             body: snapshot.hasData
               ? GestureDetector(
                   onTap: () {
-                    if (snapshot.data!.item1.isNotEmpty) {
-                      Fluttertoast.showToast(msg: snapshot.data!.item1, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.grey);
-                    }
+                    if (snapshot.data!.item1.isNotEmpty)
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(snapshot.data!.item1), duration: const Duration(seconds: 2), backgroundColor: Colors.grey));
                     model.nextToken();
                   },
                   child: Center(
@@ -113,7 +111,8 @@ class MyApp extends StatelessWidget {
                     if (snapshot.hasData && snapshot.data!.item1.isNotEmpty) {
                       Utils.showYesNoDialog(context, "Delete translation", "Are you sure you want to remove '${snapshot.data!.item1}'?", () async {
                         final error = await model.deleteTranslation(snapshot.data!.item1);
-                        Fluttertoast.showToast(msg: error.isEmpty ? "Deleted!" : error, gravity: ToastGravity.BOTTOM, backgroundColor: error.isEmpty ? Colors.green : Colors.red);
+                        final bar = SnackBar(content: Text(error.isEmpty ? "Deleted!" : error), duration: const Duration(seconds: 3), backgroundColor: error.isEmpty ? Colors.green : Colors.red);
+                        ScaffoldMessenger.of(context).showSnackBar(bar);
                         if (error.isEmpty) model.nextToken();
                       });
                     }
