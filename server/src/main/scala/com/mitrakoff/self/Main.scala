@@ -2,8 +2,8 @@ package com.mitrakoff.self
 
 import cats.effect.{Async, IO, IOApp, Resource}
 import com.comcast.ip4s.{ipv4, port}
+import com.mitrakoff.self.tommyannals.{AnnalsDao, AnnalsRoutes, AnnalsService}
 import com.mitrakoff.self.tommylingo.{LingoDao, LingoRoutes, LingoService}
-import com.mitrakoff.self.tommypass.{PassDao, PassRoutes, PassService}
 import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import org.http4s.HttpApp
@@ -13,18 +13,18 @@ import org.http4s.server.middleware.Logger
 object Main extends IOApp.Simple:
   val run: IO[Unit] = this.run[IO]
 
-  private def run[F[_] : Async]: F[Nothing] = {
+  private def run[F[_]: Async]: F[Nothing] = {
     import cats.implicits.toSemigroupKOps
     val authService: AuthService[F] = AuthService()
     createTransactor() use { tx =>
       val db: Db[F] = Db(tx)
       val lingoDao: LingoDao[F] = LingoDao(db)
-      val passDao: PassDao[F] = PassDao(db)
+      val annalsDao: AnnalsDao[F] = AnnalsDao(db)
       val lingoService: LingoService[F] = LingoService(lingoDao)
-      val passService: PassService[F] = PassService(passDao)
+      val annalsService: AnnalsService[F] = AnnalsService(annalsDao)
       val lingoRoutes: LingoRoutes[F] = LingoRoutes(lingoService)
-      val passRoutes: PassRoutes[F] = PassRoutes(authService, passService)
-      val httpApp: HttpApp[F] = (lingoRoutes.routes <+> passRoutes.routes).orNotFound
+      val annalsRoutes: AnnalsRoutes[F] = AnnalsRoutes(authService, annalsService)
+      val httpApp: HttpApp[F] = (lingoRoutes.routes <+> annalsRoutes.routes).orNotFound
       val finalHttpApp: HttpApp[F] = Logger.httpApp(logHeaders = true, logBody = true)(httpApp)
 
       EmberServerBuilder.default[F].withHost(ipv4"0.0.0.0").withPort(port"8080").withHttpApp(finalHttpApp).build.useForever
