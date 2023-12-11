@@ -33,26 +33,19 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
     AuthMiddleware(authUser, onFailure).apply(AuthedRoutes.of {
       case GET -> Root / `annals` / date as userId =>
         Try(LocalDate.parse(date)) match
-          case Failure(error) => BadRequest(s"Cannot parse date: $date ($error)")
+          case Failure(error) => BadRequest(s"Cannot parse date: $date (${error.getMessage})")
           case Success(parsed) => for {
             list <- annalsService.getAllForDate(userId, parsed)
             response <- Ok(list)
           } yield response
       case req@POST -> Root / `annals` as userId =>
-        val recordF = req.req.as[ChronicleApi]
-        val ff = for {
-          record <- recordF
+        for {
+          record <- req.req.as[ChronicleApi]
           paramIdOpt <- annalsService.getParamIdByName(userId, record.paramName)
-        } yield paramIdOpt match {
-          case None => NotFound(s"Param not found: ${record.paramName}")
-          case Some(paramId) =>
-            val chronicle = record.toModel(paramId)
-            for {
-              rows <- annalsService.add(chronicle)
-              response <- Ok(s"$rows row(s) added")
-            } yield response
-        }
-        ff.flatten
+          response <- paramIdOpt.fold(NotFound(s"Param not found: ${record.paramName}")) { paramId =>
+            annalsService.add(record.toModel(paramId)).flatMap(rows => Ok(s"$rows row(s) added"))
+          }
+        } yield response
       case PUT -> Root / `annals` as userId => Ok(s"PUT: $userId")
       case DELETE -> Root / `annals` as userId => Ok(s"DEL: $userId")
     })
