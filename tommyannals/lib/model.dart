@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:tommyannals/chronicle/chronicle.dart';
+import 'package:tommyannals/chronicle/chronicle_request.dart';
 
 class MyModel extends Model {
   final Map<DateTime, List<Chronicle>> _date2data = {};
@@ -23,6 +24,16 @@ class MyModel extends Model {
     if (response.statusCode == 200) {
       final List<dynamic> chronicleList = json.decode(response.body);
       return chronicleList.map((js) => Chronicle.fromJson(js)).toList();
+    } else return Future.error("Error: ${response.statusCode}; ${response.body}");
+  }
+
+  Future<String> addForDate(DateTime date, ChronicleRequest chronicle) async {
+    final body = json.encode(chronicle.toJson());
+    final response = await http.post(Uri.parse("http://mitrakoff.com:9090/annals"), headers: {"Authorization": "bearer 555"}, body: body);
+    if (response.statusCode == 200) {
+      _date2data.remove(date);
+      notifyListeners();
+      return response.body;
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 }

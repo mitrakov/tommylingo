@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:tommyannals/chronicle/chronicle.dart';
 import 'package:tommyannals/model.dart';
+import 'package:tommyannals/widgets/new_event.dart';
 import 'package:tommyannals/widgets/trixcontainer.dart';
 
 class EventsForDateViewer extends StatelessWidget {
@@ -21,6 +22,11 @@ class EventsForDateViewer extends StatelessWidget {
           final children = snapshot.data!.map(_createTile).toList();
           return ListView(children: children);
         }),
+        floatingActionButton: FloatingActionButton(
+          tooltip: "Add new event",
+          child: const Icon(Icons.add, size: 40),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget())),
+        ),
       );
     });
   }
