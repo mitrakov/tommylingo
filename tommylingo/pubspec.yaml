@@ -2,6 +2,7 @@
 name: tommylingo
 description: Tommylingo Mobile App
 version: 23.5.15+6
+publish_to: 'none' # to prevent publish with 'flutter pub publish'
 
 environment:
   sdk: '>=2.19.6 <3.0.0'
