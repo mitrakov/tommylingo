@@ -1,6 +1,6 @@
 package com.mitrakoff.self.tommyannals
 
-import io.circe.{Codec, Decoder, Encoder}
+import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveCodec, deriveDecoder, deriveEncoder}
 
 import java.time.LocalDate
