@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:tommyannals/events4date.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,7 +42,9 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TableCalendar(focusedDay: DateTime.now(), firstDay: DateTime.utc(2000), lastDay: DateTime.utc(2040))
+            TableCalendar(focusedDay: DateTime.now(), firstDay: DateTime.utc(2000), lastDay: DateTime.utc(2040), onDaySelected: (selectedDate, focusedDate) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EventsForDateViewer()));
+            })
           ],
         ),
       ),
