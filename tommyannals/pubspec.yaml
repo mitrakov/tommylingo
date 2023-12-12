@@ -10,12 +10,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  scoped_model: 2.0.0         # state management
-  http: 0.13.6                # http support
-  table_calendar: 3.0.9       # calendar widget
+  scoped_model: 2.0.0                # state management
+  http: 0.13.6                       # http support
+  json_annotation: 4.8.1             # json auto-generation
+  table_calendar: 3.0.9              # calendar widget
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: 2.0.0
+  build_runner: 2.3.3                # json auto-generation
+  json_serializable: 6.6.2           # json auto-generation
 
 flutter:
   uses-material-design: true
