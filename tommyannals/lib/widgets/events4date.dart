@@ -25,7 +25,7 @@ class EventsForDateViewer extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
           tooltip: "Add new event",
           child: const Icon(Icons.add, size: 40),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget())),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget(date))),
         ),
       );
     });

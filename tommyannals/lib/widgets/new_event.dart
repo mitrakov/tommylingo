@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors
+// ignore_for_file: use_key_in_widget_constructors, curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -8,13 +8,17 @@ import 'package:tommyannals/model.dart';
 import 'package:tommyannals/widgets/trixcontainer.dart';
 
 class NewEventWidget extends StatefulWidget {
+  final DateTime date;
+
+  const NewEventWidget(this.date);
+
   @override
   State<NewEventWidget> createState() => _NewEventWidgetState();
 }
 
 class _NewEventWidgetState extends State<NewEventWidget> {
   final TextEditingController eventNameCtrl = TextEditingController();
-  final Map<String, String> paramValues = {};
+  final Map<String, String> paramNamesValues = {}; // paramName => paramValue (only for current Event Name)
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +43,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
               itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
               onSuggestionSelected: (newValue) => setState(() {
                 eventNameCtrl.text = newValue;
-                paramValues.clear();
+                paramNamesValues.clear();
               }),
               hideOnEmpty: true,
             ),
@@ -50,11 +54,21 @@ class _NewEventWidgetState extends State<NewEventWidget> {
             children: children,
           );
         }),
+        floatingActionButton: FloatingActionButton(
+          tooltip: "Submit",
+          child: const Icon(Icons.send_rounded, size: 30),
+          onPressed: () {
+            _submit();
+            Navigator.pop(context);
+          },
+        ),
       );
     });
   }
 
   Widget _makeParamWidget(Param p) {
+    if (p.defaultValue != null)
+      paramNamesValues[p.name] = p.defaultValue!;
     return TrixContainer(child: ListTile(
       title: Text(p.name),
       subtitle: Text(p.description ?? "no description"),
@@ -64,9 +78,18 @@ class _NewEventWidgetState extends State<NewEventWidget> {
           initialValue: p.defaultValue,
           inputFormatters: p.type == "N" ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
           keyboardType: p.type == "N" ? const TextInputType.numberWithOptions(decimal: true) : null,
-          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Value")
+          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Value"),
+          onChanged: (s) => paramNamesValues[p.name] = s,
         )
       ),
     ));
+  }
+
+  void _submit() {
+    final model = ScopedModel.of<MyModel>(context);
+    paramNamesValues.forEach((paramName, paramValue) async {
+      // TODO: next: invalidate cache async issue
+      await model.addForDate(widget.date, eventNameCtrl.text, paramName, paramValue);
+    });
   }
 }

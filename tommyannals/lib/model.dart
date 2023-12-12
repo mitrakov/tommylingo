@@ -28,12 +28,20 @@ class MyModel extends Model {
     return _schema;
   }
 
-  Future<String> addForDate(DateTime date, ChronicleRequest chronicle) async {
-    final body = json.encode(chronicle.toJson());
+  Future<String> addForDate(DateTime date, String eventName, String paramName, String valueStr) {
+    final formatted = "$date".split(" ").first; // "2023-12-12 00:00:00.000Z" => "2023-12-12"
+    final result = _addForDate(ChronicleRequest(formatted, eventName, paramName, valueStr));
+    _date2data.remove(date); // TODO
+    notifyListeners();
+    return result;
+  }
+
+  Future<String> _addForDate(ChronicleRequest request) async {
+    final body = json.encode(request.toJson());
     print("POST http://mitrakoff.com:9090/annals: $body");
     final response = await http.post(Uri.parse("http://mitrakoff.com:9090/annals"), headers: {"Authorization": "bearer 555"}, body: body);
     if (response.statusCode == 200) {
-      _date2data.remove(date);
+      _date2data.remove(request.date); // TODO
       notifyListeners();
       return response.body;
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
