@@ -11,6 +11,7 @@ import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.server.middleware.Logger
 
 object Main extends IOApp.Simple:
+  private val password = sys.env.getOrElse("DB_PASSWORD", throw new IllegalStateException("Please provide DB_PASSWORD env variable"))
   val run: IO[Unit] = this.run[IO]
 
   private def run[F[_]: Async]: F[Nothing] = {
@@ -35,7 +36,6 @@ object Main extends IOApp.Simple:
      driver: String = "org.postgresql.Driver",
      url: String = "jdbc:postgresql://mitrakoff.com:5432/varlam",
      user: String = "mitrakov",
-     password: String = "",
    ): Resource[F, HikariTransactor[F]] = {
     for {
       connectEc <- ExecutionContexts.fixedThreadPool[F](32)
