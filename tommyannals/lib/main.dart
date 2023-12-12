@@ -6,7 +6,7 @@ import 'package:tommyannals/widgets/events4date.dart';
 import 'package:tommyannals/model.dart';
 
 void main() {
-  runApp(ScopedModel(model: MyModel(), child: MyApp()));
+  runApp(ScopedModel(model: MyModel()..schema, child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

@@ -4,9 +4,11 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:tommyannals/chronicle/chronicle.dart';
 import 'package:tommyannals/chronicle/chronicle_request.dart';
+import 'package:tommyannals/chronicle/schema.dart';
 
 class MyModel extends Model {
   final Map<DateTime, List<Chronicle>> _date2data = {};
+  final List<Schema> _schema = [];
 
   Future<List<Chronicle>> getForDate(DateTime date) async {
     final data = _date2data[date];
@@ -18,8 +20,28 @@ class MyModel extends Model {
     return data;
   }
 
+  Future<List<Schema>> get schema async {
+    if (_schema.isEmpty) {
+      final schema = await _loadSchema();
+      _schema..clear()..addAll(schema);
+    }
+    return _schema;
+  }
+
+  Future<String> addForDate(DateTime date, ChronicleRequest chronicle) async {
+    final body = json.encode(chronicle.toJson());
+    print("POST http://mitrakoff.com:9090/annals: $body");
+    final response = await http.post(Uri.parse("http://mitrakoff.com:9090/annals"), headers: {"Authorization": "bearer 555"}, body: body);
+    if (response.statusCode == 200) {
+      _date2data.remove(date);
+      notifyListeners();
+      return response.body;
+    } else return Future.error("Error: ${response.statusCode}; ${response.body}");
+  }
+
   Future<List<Chronicle>> _loadForDate(DateTime date) async {
     final formatted = "$date".split(" ").first; // "2023-12-12 00:00:00.000Z" => "2023-12-12"
+    print("GET http://mitrakoff.com:9090/annals/$formatted");
     final response = await http.get(Uri.parse("http://mitrakoff.com:9090/annals/$formatted"), headers: {"Authorization": "bearer 555"});
     if (response.statusCode == 200) {
       final List<dynamic> chronicleList = json.decode(response.body);
@@ -27,13 +49,12 @@ class MyModel extends Model {
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 
-  Future<String> addForDate(DateTime date, ChronicleRequest chronicle) async {
-    final body = json.encode(chronicle.toJson());
-    final response = await http.post(Uri.parse("http://mitrakoff.com:9090/annals"), headers: {"Authorization": "bearer 555"}, body: body);
+  Future<List<Schema>> _loadSchema() async {
+    print("GET http://mitrakoff.com:9090/annals/schema");
+    final response = await http.get(Uri.parse("http://mitrakoff.com:9090/annals/schema"), headers: {"Authorization": "bearer 555"});
     if (response.statusCode == 200) {
-      _date2data.remove(date);
-      notifyListeners();
-      return response.body;
+      final List<dynamic> schemaList = json.decode(response.body);
+      return schemaList.map((js) => Schema.fromJson(js)).toList();
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 }
