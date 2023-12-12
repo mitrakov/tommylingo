@@ -16,7 +16,7 @@ class EventsForDateViewer extends StatelessWidget {
         body: FutureBuilder(future: model.getForDate(date), builder: (context, snapshot) {
           if (snapshot.hasError) return Text("ERROR: ${snapshot.error}");
           if (!snapshot.hasData) return Text("No data for $date");
-          final children = snapshot.data!.map((e) => ListTile(title: Text(e))).toList(); // TODO ListTile onTap()
+          final children = snapshot.data!.map((chronicle) => ListTile(title: Text(chronicle.eventName))).toList(); // TODO ListTile onTap()
           return ListView(children: children);
         }),
       );

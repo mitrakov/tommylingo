@@ -10,6 +10,5 @@ class ChronicleRequest {
 
   ChronicleRequest(this.date, this.eventName, this.paramName, this.valueStr);
 
-  factory ChronicleRequest.fromJson(Map<String, dynamic> json) => _$ChronicleRequestFromJson(json);
   Map<String, dynamic> toJson() => _$ChronicleRequestToJson(this);
 }
