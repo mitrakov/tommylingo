@@ -22,7 +22,7 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
     import org.http4s.syntax.header.http4sHeaderSyntax
 
     val onFailure: AuthedRoutes[String, F] = Kleisli(req => OptionT.liftF(Forbidden(req.context)))
-    val authUser: Kleisli[F, Request[F], Either[String, Int]] = Kleisli { request =>
+    val authUser: Kleisli[F, Request[F], Either[String, Id]] = Kleisli { request =>
       val either = for {
         token <- request.headers.get[Authorization].map(_.value.toLowerCase.replace("bearer ", "")).toRight(s"Authorization header not found")
         result <- authService.isTokenValid(token)
@@ -41,11 +41,11 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
       case req@POST -> Root / `annals` as userId =>
         for {
           request <- req.req.as[ChronicleAddRequest]
-          paramIdOpt <- annalsService.getParamIdByName(userId, request.paramName)
-          response <- paramIdOpt.fold(NotFound(s"Param not found: ${request.paramName}")) { paramId =>
+          eventIdOpt <- annalsService.getEventIdByName(userId, request.eventName)
+          paramIdOpt <- annalsService.getParamIdByName(userId, eventIdOpt.getOrElse(-1), request.paramName)
+          response <- paramIdOpt.fold(NotFound(s"Event/Param not found: ${request.eventName}/${request.paramName}")) { paramId =>
             annalsService.add(request, paramId).flatMap(rows => Ok(s"$rows row(s) added"))
           }
         } yield response
-      case PUT -> Root / `annals` as userId => Ok(s"PUT: $userId")
       case DELETE -> Root / `annals` as userId => Ok(s"DEL: $userId")
     })
