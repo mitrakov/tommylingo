@@ -15,6 +15,13 @@ class AnnalsDao[F[_]](db: Db[F]):
                  WHERE date = $date AND user_id = $userId;""".query[ChronicleResponse].to[List]
     )
 
+  def fetchEventsAndParams(userId: Id): F[List[EventParam]] =
+    db.run(sql"""SELECT event.name, event.description, param.name, param.description, param.type, param.default_value
+                 FROM annals.event
+                 INNER JOIN annals.param USING(event_id)
+                 WHERE user_id = $userId;""".query[EventParam].to[List]
+    )
+
   def insert(date: LocalDate, paramId: Id, valueNum: Option[Double], valueStr: Option[String], comment: Option[String]): F[Int] =
     import doobie.implicits.javatimedrivernative._
     db.run(sql"""INSERT INTO annals.chronicle (date, param_id, value_num, value_str, comment)

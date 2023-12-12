@@ -14,8 +14,6 @@ import scala.util.{Failure, Success, Try}
 
 class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService: AnnalsService[F]) extends Http4sDsl[F]:
   private final val annals: String = "annals"
-  given EntityEncoder[F, List[ChronicleResponse]] = jsonEncoderOf
-  given EntityDecoder[F, ChronicleAddRequest] = jsonOf
 
   val routes: HttpRoutes[F] =
     import cats.implicits.{toFlatMapOps, toFunctorOps}
@@ -31,16 +29,24 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
     }
 
     AuthMiddleware(authUser, onFailure).apply(AuthedRoutes.of {
+      case GET -> Root / `annals` / "schema" as userId =>
+        given EntityEncoder[F, List[EventParamResponse]] = jsonEncoderOf
+        for {
+          evParams <- annalsService.getEventsAndParams(userId)
+          response <- Ok(evParams)
+        } yield response
+
       case GET -> Root / `annals` / date as userId =>
+        given EntityEncoder[F, List[ChronicleResponse]] = jsonEncoderOf
         Try(LocalDate.parse(date)) match
           case Failure(error) => BadRequest(s"Cannot parse date: $date (${error.getMessage})")
           case Success(parsed) => for {
             list <- annalsService.getAllForDate(userId, parsed)
             response <- Ok(list)
           } yield response
-      case GET -> Root / `annals` / "schema" as userId =>
-        Ok("TODO")
+
       case req@POST -> Root / `annals` as userId =>
+        given EntityDecoder[F, ChronicleAddRequest] = jsonOf
         for {
           request <- req.req.as[ChronicleAddRequest]
           eventIdOpt <- annalsService.getEventIdByName(userId, request.eventName)
@@ -49,5 +55,6 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
             annalsService.add(request, paramId).flatMap(rows => Ok(s"$rows row(s) added"))
           }
         } yield response
+
       case DELETE -> Root / `annals` as userId => Ok(s"DEL: $userId")
     })
