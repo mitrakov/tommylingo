@@ -1,52 +1,27 @@
+// ignore_for_file: use_key_in_widget_constructors
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:tommyannals/events4date.dart';
+import 'package:tommyannals/model.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ScopedModel(model: MyModel(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TableCalendar(focusedDay: DateTime.now(), firstDay: DateTime.utc(2000), lastDay: DateTime.utc(2040), onDaySelected: (selectedDate, focusedDate) {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => EventsForDateViewer()));
-            })
-          ],
-        ),
+      title: "Tommy Annals",
+      theme: ThemeData(primarySwatch: Colors.orange),
+      home: Scaffold(
+        appBar: AppBar(title: const Text("Tommy Annals")),
+        body: Builder(builder: (context) { // wrap into a Builder to avoid "Navigator operation requested with a context" error
+          return TableCalendar(focusedDay: DateTime.now(), firstDay: DateTime.utc(2000), lastDay: DateTime.utc(2040), onDaySelected: (selectedDate, focusedDate) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => EventsForDateViewer(selectedDate)));
+          });
+        }),
       ),
     );
   }

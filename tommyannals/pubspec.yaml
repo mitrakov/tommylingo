@@ -10,7 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  table_calendar: 3.0.9         # calendar widget
+  scoped_model: 2.0.0         # state management
+  http: 0.13.6                # http support
+  table_calendar: 3.0.9       # calendar widget
 
 dev_dependencies:
   flutter_lints: ^2.0.0
