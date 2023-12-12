@@ -6,7 +6,7 @@ val circeVersion = "0.14.5"
 
 organization := "com.mitrakoff.self"
 name := "tommyserver"
-version := "23.5.28"
+version := "23.12.12" // change version here, then "sbt docker:publish"
 scalaVersion := "3.2.1"
 libraryDependencies ++= Seq(
   "org.http4s"    %% "http4s-ember-server" % http4sVersion,
