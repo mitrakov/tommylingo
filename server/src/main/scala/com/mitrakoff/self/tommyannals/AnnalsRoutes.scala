@@ -14,8 +14,8 @@ import scala.util.{Failure, Success, Try}
 
 class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService: AnnalsService[F]) extends Http4sDsl[F]:
   private final val annals: String = "annals"
-  given EntityEncoder[F, List[Chronicle]] = jsonEncoderOf[F, List[Chronicle]]
-  given EntityDecoder[F, ChronicleApi] = jsonOf[F, ChronicleApi]
+  given EntityEncoder[F, List[ChronicleResponse]] = jsonEncoderOf
+  given EntityDecoder[F, ChronicleAddRequest] = jsonOf
 
   val routes: HttpRoutes[F] =
     import cats.implicits.{toFlatMapOps, toFunctorOps}
@@ -40,10 +40,10 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
           } yield response
       case req@POST -> Root / `annals` as userId =>
         for {
-          record <- req.req.as[ChronicleApi]
-          paramIdOpt <- annalsService.getParamIdByName(userId, record.paramName)
-          response <- paramIdOpt.fold(NotFound(s"Param not found: ${record.paramName}")) { paramId =>
-            annalsService.add(record.toModel(paramId)).flatMap(rows => Ok(s"$rows row(s) added"))
+          request <- req.req.as[ChronicleAddRequest]
+          paramIdOpt <- annalsService.getParamIdByName(userId, request.paramName)
+          response <- paramIdOpt.fold(NotFound(s"Param not found: ${request.paramName}")) { paramId =>
+            annalsService.add(request, paramId).flatMap(rows => Ok(s"$rows row(s) added"))
           }
         } yield response
       case PUT -> Root / `annals` as userId => Ok(s"PUT: $userId")

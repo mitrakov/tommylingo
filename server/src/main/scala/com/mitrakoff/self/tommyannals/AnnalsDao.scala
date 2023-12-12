@@ -6,19 +6,19 @@ import java.time.LocalDate
 
 // notes: you must specify schema name (`annals.`) explicitly!
 class AnnalsDao[F[_]](db: Db[F]):
-  def fetchAllForDate(userId: Int, date: LocalDate): F[List[Chronicle]] =
+  def fetchAllForDate(userId: Int, date: LocalDate): F[List[ChronicleResponse]] =
     import doobie.implicits.javatimedrivernative._
-    db.run(sql"""SELECT date, param_id, value_num, value_str, comment
+    db.run(sql"""SELECT date, event.name, param.name, value_num, value_str, comment
                  FROM annals.chronicle
                  INNER JOIN annals.param USING(param_id)
                  INNER JOIN annals.event USING(event_id)
-                 WHERE date = $date AND user_id = $userId;""".query[Chronicle].to[List]
+                 WHERE date = $date AND user_id = $userId;""".query[ChronicleResponse].to[List]
     )
 
-  def insert(item: Chronicle): F[Int] =
+  def insert(date: LocalDate, paramId: Int, valueNum: Option[Double], valueStr: Option[String], comment: Option[String]): F[Int] =
     import doobie.implicits.javatimedrivernative._
     db.run(sql"""INSERT INTO annals.chronicle (date, param_id, value_num, value_str, comment)
-                 VALUES (${item.date.getOrElse(LocalDate.now())}, ${item.paramId}, ${item.valueNum}, ${item.valueStr}, ${item.comment});""".update.run
+                 VALUES ($date, $paramId, $valueNum, $valueStr, $comment);""".update.run
     )
 
   def findParamId(userId: Int, paramName: String): F[Option[Int]] =
