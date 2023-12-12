@@ -1,5 +1,6 @@
 // ignore_for_file: use_key_in_widget_constructors
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:tommyannals/chronicle/schema.dart';
@@ -13,6 +14,7 @@ class NewEventWidget extends StatefulWidget {
 
 class _NewEventWidgetState extends State<NewEventWidget> {
   final TextEditingController eventNameCtrl = TextEditingController();
+  final Map<String, String> paramValues = {};
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,10 @@ class _NewEventWidgetState extends State<NewEventWidget> {
                 return list;
               },
               itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
-              onSuggestionSelected: (newValue) => setState(() {eventNameCtrl.text = newValue;}),
+              onSuggestionSelected: (newValue) => setState(() {
+                eventNameCtrl.text = newValue;
+                paramValues.clear();
+              }),
               hideOnEmpty: true,
             ),
             const SizedBox(height: 10),
@@ -50,11 +55,18 @@ class _NewEventWidgetState extends State<NewEventWidget> {
   }
 
   Widget _makeParamWidget(Param p) {
-    return TrixContainer(child: Row(children: [
-      Text(p.name),
-      Text(p.description ?? "–"),
-      Text(p.type),
-      Text(p.defaultValue ?? "–"),
-    ]));
+    return TrixContainer(child: ListTile(
+      title: Text(p.name),
+      subtitle: Text(p.description ?? "no description"),
+      trailing: SizedBox(
+        width: 180,
+        child: TextFormField(
+          initialValue: p.defaultValue,
+          inputFormatters: p.type == "N" ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
+          keyboardType: p.type == "N" ? const TextInputType.numberWithOptions(decimal: true) : null,
+          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Value")
+        )
+      ),
+    ));
   }
 }
