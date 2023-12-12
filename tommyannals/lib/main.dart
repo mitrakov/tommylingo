@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:tommyannals/events4date.dart';
+import 'package:tommyannals/widgets/events4date.dart';
 import 'package:tommyannals/model.dart';
 
 void main() {
