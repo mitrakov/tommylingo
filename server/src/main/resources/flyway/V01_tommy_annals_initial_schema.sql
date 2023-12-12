@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS param (
   name VARCHAR(128) NOT NULL,
   description VARCHAR(255) NULL,
   type ParamType NOT NULL DEFAULT 'S',
+  default_value VARCHAR(255) NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT param_event_name UNIQUE (event_id, name)
 );
@@ -54,6 +55,7 @@ COMMENT ON COLUMN param.event_id IS 'Foreign key to event table';
 COMMENT ON COLUMN param.name IS 'Event name';
 COMMENT ON COLUMN param.description IS 'Event description, optional';
 COMMENT ON COLUMN param.type IS 'Type of this parameter: N=numeric, S=string';
+COMMENT ON COLUMN param.default_value IS 'Default value expressed as a string (for both N and S types), just hint for clients';
 COMMENT ON COLUMN param.created_at IS 'Current timestamp';
 
 
@@ -73,7 +75,7 @@ COMMENT ON TABLE  chronicle IS 'Main table; stores parameter key-value pairs for
 COMMENT ON COLUMN chronicle.id IS 'Primary key, auto-incremented';
 COMMENT ON COLUMN chronicle.date IS 'Date';
 COMMENT ON COLUMN chronicle.param_id IS 'Foreign key to parameters';
-COMMENT ON COLUMN chronicle.value_num IS 'Numberic value of the event, optional but either `value_num` or `value_str` must be defined';
+COMMENT ON COLUMN chronicle.value_num IS 'Numeric value of the event, optional but either `value_num` or `value_str` must be defined';
 COMMENT ON COLUMN chronicle.value_str IS 'String value of the event, optional but either `value_num` or `value_str` must be defined';
 COMMENT ON COLUMN chronicle.comment IS 'Comment on this record, optional';
 COMMENT ON COLUMN chronicle.created_at IS 'Current timestamp';

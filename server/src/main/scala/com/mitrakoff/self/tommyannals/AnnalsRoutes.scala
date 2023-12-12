@@ -38,6 +38,8 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
             list <- annalsService.getAllForDate(userId, parsed)
             response <- Ok(list)
           } yield response
+      case GET -> Root / `annals` / "schema" as userId =>
+        Ok("TODO")
       case req@POST -> Root / `annals` as userId =>
         for {
           request <- req.req.as[ChronicleAddRequest]
