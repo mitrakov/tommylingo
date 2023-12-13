@@ -37,7 +37,7 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
         } yield response
 
       case GET -> Root / `annals` / date as userId =>
-        given EntityEncoder[F, List[ChronicleResponse]] = jsonEncoderOf
+        given EntityEncoder[F, ChronicleResponse] = jsonEncoderOf
         Try(LocalDate.parse(date)) match
           case Failure(error) => BadRequest(s"Cannot parse date: $date (${error.getMessage})")
           case Success(parsed) => for {

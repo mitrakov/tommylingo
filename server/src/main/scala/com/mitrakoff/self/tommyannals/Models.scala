@@ -13,7 +13,8 @@ case class ChronicleAddRequest(date: LocalDate, eventName: String, params: List[
 
 // === Chronicle Response (GET) ===
 case class ChronicleResponseParam(paramName: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
-case class ChronicleResponse(date: LocalDate, eventName: String, params: List[ChronicleResponseParam])
+case class ChronicleResponseEvent(eventName: String, params: List[ChronicleResponseParam])
+case class ChronicleResponse(date: LocalDate, events: List[ChronicleResponseEvent])
 
 // === Schema Response ===
 case class SchemaResponseParam(name: String, description: Option[String], `type`: String, defaultValue: Option[String])
@@ -27,6 +28,7 @@ object SchemaResponse:
 
 object ChronicleResponse:
   given Encoder[ChronicleResponseParam] = deriveEncoder
+  given Encoder[ChronicleResponseEvent] = deriveEncoder
   given Encoder[ChronicleResponse] = deriveEncoder
 
 object ChronicleAddRequest:
