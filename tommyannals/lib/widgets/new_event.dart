@@ -33,6 +33,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
 
           final eventNames = snapshot.data!.map((e) => e.eventName);
           final eventName = eventNameCtrl.text;
+          final eventDescription   = eventName.isNotEmpty ? snapshot.data!.firstWhere((schema) => schema.eventName == eventName).eventDescription : null;
           final List<Param> params = eventName.isNotEmpty ? snapshot.data!.firstWhere((schema) => schema.eventName == eventName).params : [];
           final children = [
             const SizedBox(height: 10),
@@ -51,10 +52,13 @@ class _NewEventWidgetState extends State<NewEventWidget> {
               }),
               hideOnEmpty: true,
             ),
+            SizedBox(height: eventDescription != null ? 10 : 0),
+            Padding(padding: const EdgeInsets.only(left: 12), child: Text(eventDescription ?? "", textScaleFactor: 0.9)),
             const SizedBox(height: 10),
             ...params.map(_makeParamWidget),
           ];
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: children,
           );
         }),
