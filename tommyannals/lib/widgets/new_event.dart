@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:tommyannals/chronicle/chronicle_add_request.dart';
 import 'package:tommyannals/chronicle/schema.dart';
 import 'package:tommyannals/model.dart';
 import 'package:tommyannals/widgets/trixcontainer.dart';
@@ -59,11 +60,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
         floatingActionButton: FloatingActionButton(
           tooltip: "Submit",
           child: const Icon(Icons.send_rounded, size: 30),
-          onPressed: () {
-            paramNamesStrValues.forEach((paramName, paramValue) => model.addStrForDate(widget.date, eventNameCtrl.text, paramName, paramValue));
-            paramNamesNumValues.forEach((paramName, paramValue) => model.addNumForDate(widget.date, eventNameCtrl.text, paramName, paramValue));
-            Navigator.pop(context);
-          },
+          onPressed: () => _submit(model),
         ),
       );
     });
@@ -91,5 +88,15 @@ class _NewEventWidgetState extends State<NewEventWidget> {
         )
       ),
     ));
+  }
+
+  void _submit(MyModel model) {
+    final params = [
+    ...paramNamesStrValues.entries.map((e) => ChronicleAddRequestParam(e.key, e.value, null)),
+    ...paramNamesNumValues.entries.map((e) => ChronicleAddRequestParam(e.key, null, e.value)),
+    ];
+    model.addForDate(widget.date, eventNameCtrl.text, params);
+
+    Navigator.pop(context);
   }
 }
