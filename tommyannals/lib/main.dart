@@ -3,15 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:tommyannals/widgets/events4date.dart';
 import 'package:tommyannals/model.dart';
+import 'package:tommyannals/widgets/events4date.dart';
+import 'package:tommyannals/widgets/new_event.dart';
 
 void main() {
   initializeDateFormatting(); // to load locales for TableCalendar
   runApp(ScopedModel(model: MyModel()..schema, child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  DateTime _currentDate = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -19,17 +27,32 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(primarySwatch: Colors.orange),
       home: Scaffold(
         appBar: AppBar(title: const Text("Tommy Annals")),
-        body: Builder(builder: (context) { // wrap into a Builder to avoid "Navigator operation requested with a context" error
-          return TableCalendar(
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            locale: "es_ES", // make sure to call initializeDateFormatting() from import 'package:intl/date_symbol_data_local.dart';
-            focusedDay: DateTime.now(),
-            firstDay: DateTime.utc(2000),
-            lastDay: DateTime.utc(2040),
-            onDaySelected: (selectedDate, focusedDate) => Navigator.push(context, MaterialPageRoute(builder: (_) => EventsForDateViewer(selectedDate)))
-          );
-        }),
+        body: Column(
+          children: [
+            TableCalendar(
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              locale: "es_ES", // make sure to call initializeDateFormatting() from import 'package:intl/date_symbol_data_local.dart';
+              focusedDay: DateTime.now(),
+              firstDay: DateTime.utc(2000),
+              lastDay: DateTime.utc(2040),
+              onDaySelected: (selectedDate, focusedDate) => setState(() { _currentDate = selectedDate; }),
+            ),
+            const Text("Eventos", textScaleFactor: 1.4),
+            Expanded(child: EventsForDateViewer(_currentDate)),
+          ],
+        ),
+        floatingActionButton: Builder( //*
+          builder: (context) {
+            return FloatingActionButton(
+              tooltip: "Add new event",
+              child: const Icon(Icons.add, size: 40),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget(_currentDate))),
+            );
+          }
+        )
       ),
     );
   }
 }
+
+// *) to avoid error: "Navigator operation requested with a context that does not include a Navigator."

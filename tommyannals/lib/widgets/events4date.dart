@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:tommyannals/chronicle/chronicle_response.dart';
 import 'package:tommyannals/model.dart';
-import 'package:tommyannals/widgets/new_event.dart';
 import 'package:tommyannals/widgets/trixcontainer.dart';
 
 class EventsForDateViewer extends StatelessWidget {
@@ -14,20 +13,12 @@ class EventsForDateViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MyModel>(builder: (context, child, model) {
-      return Scaffold(
-        appBar: AppBar(title: const Text("Tommy Annals")),
-        body: FutureBuilder(future: model.getForDate(date), builder: (context, snapshot) {
-          if (snapshot.hasError) return Text("ERROR: ${snapshot.error}");
-          if (!snapshot.hasData) return Text("No data for $date");
-          final children = snapshot.data!.events.map(_createTile).toList();
-          return ListView(children: children);
-        }),
-        floatingActionButton: FloatingActionButton(
-          tooltip: "Add new event",
-          child: const Icon(Icons.add, size: 40),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget(date))),
-        ),
-      );
+      return FutureBuilder(future: model.getForDate(date), builder: (context, snapshot) {
+        if (snapshot.hasError) return Text("ERROR: ${snapshot.error}");
+        if (!snapshot.hasData) return Text("No data for $date");
+        final children = snapshot.data!.events.map(_createTile).toList();
+        return ListView(children: children);
+      });
     });
   }
 
