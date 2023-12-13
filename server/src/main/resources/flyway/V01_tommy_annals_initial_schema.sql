@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS param (
   name VARCHAR(128) NOT NULL,
   description VARCHAR(255) NULL,
   type ParamType NOT NULL DEFAULT 'S',
+  unit VARCHAR(64) NULL,
   default_value VARCHAR(255) NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT param_event_name UNIQUE (event_id, name)
@@ -55,6 +56,7 @@ COMMENT ON COLUMN param.event_id IS 'Foreign key to event table';
 COMMENT ON COLUMN param.name IS 'Event name';
 COMMENT ON COLUMN param.description IS 'Event description, optional';
 COMMENT ON COLUMN param.type IS 'Type of this parameter: N=numeric, S=string';
+COMMENT ON COLUMN param.unit IS 'Unit (kg, km, minutes, rubles, gallons, etc.), optional';
 COMMENT ON COLUMN param.default_value IS 'Default value expressed as a string (for both N and S types), just hint for clients';
 COMMENT ON COLUMN param.created_at IS 'Current timestamp';
 
