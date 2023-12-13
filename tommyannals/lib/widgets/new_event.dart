@@ -107,7 +107,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
   }
 
   double _parseDouble(String s) {
-    final d = double.tryParse(s);
+    final d = double.tryParse(s.replaceAll(",", "."));
     if (d == null)
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No se puede analizar el número: $s")));
     return d ?? -1;
