@@ -6,11 +6,11 @@ import java.time.LocalDate
 class AnnalsService[F[_]: Functor](dao: AnnalsDao[F]):
   def getAllForDate(userId: Id, date: LocalDate): F[List[ChronicleResponse]] = dao.fetchAllForDate(userId, date)
 
-  def getEventsAndParams(userId: Id): F[List[EventParamResponse]] = {
+  def getSchema(userId: Id): F[List[SchemaResponse]] = {
     import cats.implicits.toFunctorOps
     dao.fetchEventsAndParams(userId) map { params =>
-      val grouped = params.groupMap(p => p.eventName -> p.eventDescription) (p => Param(p.name, p.description, p.`type`, p.defaultValue))
-      grouped.map { case ((eventName, eventDescription), params) => EventParamResponse(eventName, eventDescription, params) }.toList
+      val grouped = params.groupMap(p => p.eventName -> p.eventDescription) (p => SchemaResponseParam(p.name, p.description, p.`type`, p.defaultValue))
+      grouped.map { case ((eventName, eventDescription), params) => SchemaResponse(eventName, eventDescription, params) }.toList
     }
   }
 

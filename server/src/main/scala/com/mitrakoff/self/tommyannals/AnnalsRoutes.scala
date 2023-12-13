@@ -30,9 +30,9 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
 
     AuthMiddleware(authUser, onFailure).apply(AuthedRoutes.of {
       case GET -> Root / `annals` / "schema" as userId =>
-        given EntityEncoder[F, List[EventParamResponse]] = jsonEncoderOf
+        given EntityEncoder[F, List[SchemaResponse]] = jsonEncoderOf
         for {
-          evParams <- annalsService.getEventsAndParams(userId)
+          evParams <- annalsService.getSchema(userId)
           response <- Ok(evParams)
         } yield response
 

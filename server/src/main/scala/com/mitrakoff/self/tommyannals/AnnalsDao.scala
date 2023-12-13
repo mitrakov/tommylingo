@@ -6,6 +6,8 @@ import java.time.LocalDate
 
 // notes: you must specify schema name (`annals.`) explicitly!
 class AnnalsDao[F[_]](db: Db[F]):
+  case class EventParam(eventName: String, eventDescription: Option[String], name: String, description: Option[String], `type`: String, defaultValue: Option[String])
+  
   def fetchAllForDate(userId: Id, date: LocalDate): F[List[ChronicleResponse]] =
     import doobie.implicits.javatimedrivernative._
     db.run(sql"""SELECT date, event.name, param.name, value_num, value_str, comment

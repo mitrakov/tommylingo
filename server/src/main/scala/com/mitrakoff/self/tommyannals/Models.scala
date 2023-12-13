@@ -7,20 +7,26 @@ import java.time.LocalDate
 
 type Id = Int
 
-case class ChronicleResponse(date: LocalDate, eventName: String, paramName: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
+// === Chronicle Add Request (POST) ===
 case class ChronicleAddRequest(date: LocalDate, eventName: String, paramName: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
-case class EventParam(eventName: String, eventDescription: Option[String], name: String, description: Option[String], `type`: String, defaultValue: Option[String])
-case class Param(name: String, description: Option[String], `type`: String, defaultValue: Option[String])
-case class EventParamResponse(eventName: String, eventDescription: Option[String], params: List[Param])
+
+// === Chronicle Response (GET) ===
+case class ChronicleResponseParam(paramName: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
+case class ChronicleResponse(date: LocalDate, eventName: String, params: List[ChronicleResponseParam])
+
+// === Schema Response ===
+case class SchemaResponseParam(name: String, description: Option[String], `type`: String, defaultValue: Option[String])
+case class SchemaResponse(eventName: String, eventDescription: Option[String], params: List[SchemaResponseParam])
+// ===
+
+// === CODECS ===
+object SchemaResponse:
+  given Encoder[SchemaResponseParam] = deriveEncoder
+  given Encoder[SchemaResponse] = deriveEncoder
 
 object ChronicleResponse:
+  given Encoder[ChronicleResponseParam] = deriveEncoder
   given Encoder[ChronicleResponse] = deriveEncoder
 
 object ChronicleAddRequest:
   given Decoder[ChronicleAddRequest] = deriveDecoder
-
-object Param:
-  given Encoder[Param] = deriveEncoder
-
-object EventParamResponse:
-  given Encoder[EventParamResponse] = deriveEncoder
