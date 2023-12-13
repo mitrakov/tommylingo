@@ -71,7 +71,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
 
     if (p.defaultValue != null) {
       // onChange() is not called on TextFormField when "initialValue" is assigned, so we need to store initial values explicitly
-      isNumeric ? paramNamesNumValues[p.name] = double.parse(p.defaultValue!) : paramNamesStrValues[p.name] = p.defaultValue!;
+      isNumeric ? paramNamesNumValues[p.name] = _parseDouble(p.defaultValue!) : paramNamesStrValues[p.name] = p.defaultValue!;
     }
 
     return TrixContainer(child: ListTile(
@@ -84,7 +84,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
           inputFormatters: isNumeric ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
           keyboardType: isNumeric ? const TextInputType.numberWithOptions(decimal: true) : null,
           decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Value"),
-          onChanged: (s) => isNumeric ? paramNamesNumValues[p.name] = double.parse(s) : paramNamesStrValues[p.name] = s,
+          onChanged: (s) => isNumeric ? paramNamesNumValues[p.name] = _parseDouble(s) : paramNamesStrValues[p.name] = s,
         )
       ),
     ));
@@ -95,8 +95,16 @@ class _NewEventWidgetState extends State<NewEventWidget> {
     ...paramNamesStrValues.entries.map((e) => ChronicleAddRequestParam(e.key, e.value, null)),
     ...paramNamesNumValues.entries.map((e) => ChronicleAddRequestParam(e.key, null, e.value)),
     ];
-    model.addForDate(widget.date, eventNameCtrl.text, params);
+    if (params.isNotEmpty) {
+      model.addForDate(widget.date, eventNameCtrl.text, params);
+      Navigator.pop(context);
+    } else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please specify parameters")));
+  }
 
-    Navigator.pop(context);
+  double _parseDouble(String s) {
+    final d = double.tryParse(s);
+    if (d == null)
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Cannot parse number: $s")));
+    return d ?? -1;
   }
 }
