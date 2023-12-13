@@ -1,7 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:tommyannals/chronicle/chronicle.dart';
+import 'package:tommyannals/chronicle/chronicle_response.dart';
 import 'package:tommyannals/model.dart';
 import 'package:tommyannals/widgets/new_event.dart';
 import 'package:tommyannals/widgets/trixcontainer.dart';
@@ -19,7 +19,7 @@ class EventsForDateViewer extends StatelessWidget {
         body: FutureBuilder(future: model.getForDate(date), builder: (context, snapshot) {
           if (snapshot.hasError) return Text("ERROR: ${snapshot.error}");
           if (!snapshot.hasData) return Text("No data for $date");
-          final children = snapshot.data!.map(_createTile).toList();
+          final children = snapshot.data!.events.map(_createTile).toList();
           return ListView(children: children);
         }),
         floatingActionButton: FloatingActionButton(
@@ -31,10 +31,11 @@ class EventsForDateViewer extends StatelessWidget {
     });
   }
 
-  Widget _createTile(Chronicle chronicle) {
+  Widget _createTile(ChronicleEvent event) {
+    final paramsStr = event.params.map((p) => p.valueStr ?? "${p.valueNum}").join("    ");
     return TrixContainer(child: ListTile(
-      title: Text(chronicle.eventName, textScaleFactor: 1.5),
-      trailing: Text(chronicle.valueStr ?? "${chronicle.valueNum}"),
+      title: Text(event.eventName, textScaleFactor: 1.5),
+      trailing: Text(paramsStr),
     ));
   }
 }

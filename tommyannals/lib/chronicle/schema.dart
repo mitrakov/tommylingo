@@ -13,9 +13,7 @@ class Param {
   factory Param.fromJson(Map<String, dynamic> json) => _$ParamFromJson(json);
 
   @override
-  String toString() {
-    return 'Param{name: $name, description: $description, type: $type, defaultValue: $defaultValue}';
-  }
+  String toString() => 'Param{name: $name, description: $description, type: $type, defaultValue: $defaultValue}';
 }
 
 @JsonSerializable()
@@ -29,7 +27,5 @@ class Schema {
   factory Schema.fromJson(Map<String, dynamic> json) => _$SchemaFromJson(json);
 
   @override
-  String toString() {
-    return 'Schema{eventName: $eventName, eventDescription: $eventDescription, params: $params}';
-  }
+  String toString() => 'Schema{eventName: $eventName, eventDescription: $eventDescription, params: $params}';
 }
