@@ -11,4 +11,9 @@ class ChronicleRequest {
   ChronicleRequest(this.date, this.eventName, this.paramName, this.valueStr);
 
   Map<String, dynamic> toJson() => _$ChronicleRequestToJson(this);
+
+  @override
+  String toString() {
+    return 'ChronicleRequest{date: $date, eventName: $eventName, paramName: $paramName, valueStr: $valueStr}';
+  }
 }

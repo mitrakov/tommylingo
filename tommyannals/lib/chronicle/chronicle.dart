@@ -13,4 +13,9 @@ class Chronicle {
   Chronicle(this.date, this.eventName, this.paramName, this.valueNum, this.valueStr, this.comment);
 
   factory Chronicle.fromJson(Map<String, dynamic> json) => _$ChronicleFromJson(json);
+
+  @override
+  String toString() {
+    return 'Chronicle{date: $date, eventName: $eventName, paramName: $paramName, valueNum: $valueNum, valueStr: $valueStr, comment: $comment}';
+  }
 }

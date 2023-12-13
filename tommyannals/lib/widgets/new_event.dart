@@ -58,7 +58,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
           tooltip: "Submit",
           child: const Icon(Icons.send_rounded, size: 30),
           onPressed: () {
-            _submit();
+            paramNamesValues.forEach((paramName, paramValue) => model.addForDate(widget.date, eventNameCtrl.text, paramName, paramValue));
             Navigator.pop(context);
           },
         ),
@@ -83,13 +83,5 @@ class _NewEventWidgetState extends State<NewEventWidget> {
         )
       ),
     ));
-  }
-
-  void _submit() {
-    final model = ScopedModel.of<MyModel>(context);
-    paramNamesValues.forEach((paramName, paramValue) async {
-      // TODO: next: invalidate cache async issue
-      await model.addForDate(widget.date, eventNameCtrl.text, paramName, paramValue);
-    });
   }
 }

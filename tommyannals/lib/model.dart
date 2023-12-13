@@ -29,28 +29,26 @@ class MyModel extends Model {
   }
 
   Future<String> addForDate(DateTime date, String eventName, String paramName, String valueStr) {
-    final formatted = "$date".split(" ").first; // "2023-12-12 00:00:00.000Z" => "2023-12-12"
-    final result = _addForDate(ChronicleRequest(formatted, eventName, paramName, valueStr));
-    _date2data.remove(date); // TODO
-    notifyListeners();
-    return result;
+    return _addForDate(date, ChronicleRequest(_extractDate(date), eventName, paramName, valueStr));
   }
 
-  Future<String> _addForDate(ChronicleRequest request) async {
+  Future<String> _addForDate(DateTime key, ChronicleRequest request) async {
     final body = json.encode(request.toJson());
     print("POST http://mitrakoff.com:9090/annals: $body");
     final response = await http.post(Uri.parse("http://mitrakoff.com:9090/annals"), headers: {"Authorization": "bearer 555"}, body: body);
+    print("> ${response.body}");
     if (response.statusCode == 200) {
-      _date2data.remove(request.date); // TODO
+      _date2data.remove(key);
       notifyListeners();
       return response.body;
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 
   Future<List<Chronicle>> _loadForDate(DateTime date) async {
-    final formatted = "$date".split(" ").first; // "2023-12-12 00:00:00.000Z" => "2023-12-12"
+    final formatted = _extractDate(date);
     print("GET http://mitrakoff.com:9090/annals/$formatted");
     final response = await http.get(Uri.parse("http://mitrakoff.com:9090/annals/$formatted"), headers: {"Authorization": "bearer 555"});
+    print("> ${response.body}");
     if (response.statusCode == 200) {
       final List<dynamic> chronicleList = json.decode(response.body);
       return chronicleList.map((js) => Chronicle.fromJson(js)).toList();
@@ -60,9 +58,12 @@ class MyModel extends Model {
   Future<List<Schema>> _loadSchema() async {
     print("GET http://mitrakoff.com:9090/annals/schema");
     final response = await http.get(Uri.parse("http://mitrakoff.com:9090/annals/schema"), headers: {"Authorization": "bearer 555"});
+    print("> ${response.body}");
     if (response.statusCode == 200) {
       final List<dynamic> schemaList = json.decode(response.body);
       return schemaList.map((js) => Schema.fromJson(js)).toList();
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
+
+  String _extractDate(DateTime date) => "$date".split(" ").first; // "2023-12-12 00:00:00.000Z" => "2023-12-12"
 }
