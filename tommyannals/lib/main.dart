@@ -54,7 +54,7 @@ class _MyAppState extends State<MyApp> {
         floatingActionButton: Builder( // to avoid error: "Navigator operation requested with a context that does not include a Navigator."
           builder: (context) {
             return FloatingActionButton(
-              tooltip: "Add new event",
+              tooltip: "Crear nuevo evento",
               child: const Icon(Icons.add, size: 40),
               onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget(_focusedDate))),
             );

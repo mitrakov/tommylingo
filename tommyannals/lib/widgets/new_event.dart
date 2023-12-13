@@ -29,14 +29,15 @@ class _NewEventWidgetState extends State<NewEventWidget> {
         appBar: AppBar(title: const Text("Tommy Annals")),
         body: FutureBuilder(future: model.schema, builder: (context, snapshot) {
           if (snapshot.hasError) return Text("ERROR: ${snapshot.error}");
-          if (!snapshot.hasData) return const Text("ERROR: No schema found");
+          if (!snapshot.hasData) return const Text("ERROR: No se encontró esquema");
+
           final eventNames = snapshot.data!.map((e) => e.eventName);
           final eventName = eventNameCtrl.text;
           final List<Param> params = eventName.isNotEmpty ? snapshot.data!.firstWhere((schema) => schema.eventName == eventName).params : [];
           final children = [
             const SizedBox(height: 10),
             TypeAheadField<String>(
-              textFieldConfiguration: TextFieldConfiguration(controller: eventNameCtrl, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Event name")),
+              textFieldConfiguration: TextFieldConfiguration(controller: eventNameCtrl, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Nombre del evento")),
               suggestionsCallback: (prefix) {
                 final list = List<String>.from(eventNames);
                 list.retainWhere((s) => s.toLowerCase().contains(prefix.toLowerCase()));
@@ -58,7 +59,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
           );
         }),
         floatingActionButton: FloatingActionButton(
-          tooltip: "Submit",
+          tooltip: "Enviar",
           child: const Icon(Icons.send_rounded, size: 30),
           onPressed: () => _submit(model),
         ),
@@ -76,14 +77,14 @@ class _NewEventWidgetState extends State<NewEventWidget> {
 
     return TrixContainer(child: ListTile(
       title: Text(p.name),
-      subtitle: Text(p.description ?? "No description"),
+      subtitle: Text(p.description ?? "Ninguna descripción"),
       trailing: SizedBox(
-        width: 180,
+        width: 170,
         child: TextFormField(
           initialValue: p.defaultValue,
           inputFormatters: isNumeric ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
           keyboardType: isNumeric ? const TextInputType.numberWithOptions(decimal: true) : null,
-          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Value"),
+          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Valor"),
           onChanged: (s) => isNumeric ? paramNamesNumValues[p.name] = _parseDouble(s) : paramNamesStrValues[p.name] = s,
         )
       ),
@@ -98,13 +99,13 @@ class _NewEventWidgetState extends State<NewEventWidget> {
     if (params.isNotEmpty) {
       model.addForDate(widget.date, eventNameCtrl.text, params);
       Navigator.pop(context);
-    } else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Please specify parameters")));
+    } else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Especifique los parámetros")));
   }
 
   double _parseDouble(String s) {
     final d = double.tryParse(s);
     if (d == null)
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Cannot parse number: $s")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No se puede analizar el número: $s")));
     return d ?? -1;
   }
 }
