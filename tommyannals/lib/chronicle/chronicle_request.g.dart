@@ -11,7 +11,8 @@ ChronicleRequest _$ChronicleRequestFromJson(Map<String, dynamic> json) =>
       json['date'] as String,
       json['eventName'] as String,
       json['paramName'] as String,
-      json['valueStr'] as String,
+      json['valueStr'] as String?,
+      (json['valueNum'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$ChronicleRequestToJson(ChronicleRequest instance) =>
@@ -20,4 +21,5 @@ Map<String, dynamic> _$ChronicleRequestToJson(ChronicleRequest instance) =>
       'eventName': instance.eventName,
       'paramName': instance.paramName,
       'valueStr': instance.valueStr,
+      'valueNum': instance.valueNum,
     };

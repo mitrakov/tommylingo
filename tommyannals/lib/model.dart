@@ -28,8 +28,12 @@ class MyModel extends Model {
     return _schema;
   }
 
-  Future<String> addForDate(DateTime date, String eventName, String paramName, String valueStr) {
-    return _addForDate(date, ChronicleRequest(_extractDate(date), eventName, paramName, valueStr));
+  Future<String> addStrForDate(DateTime date, String eventName, String paramName, String valueStr) {
+    return _addForDate(date, ChronicleRequest(_extractDate(date), eventName, paramName, valueStr, null));
+  }
+
+  Future<String> addNumForDate(DateTime date, String eventName, String paramName, double valueNum) {
+    return _addForDate(date, ChronicleRequest(_extractDate(date), eventName, paramName, null, valueNum));
   }
 
   Future<String> _addForDate(DateTime key, ChronicleRequest request) async {

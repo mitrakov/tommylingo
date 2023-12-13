@@ -6,14 +6,15 @@ class ChronicleRequest {
   final String date;
   final String eventName;
   final String paramName;
-  final String valueStr;
+  final String? valueStr;
+  final double? valueNum;
 
-  ChronicleRequest(this.date, this.eventName, this.paramName, this.valueStr);
+  ChronicleRequest(this.date, this.eventName, this.paramName, this.valueStr, this.valueNum);
 
   Map<String, dynamic> toJson() => _$ChronicleRequestToJson(this);
 
   @override
   String toString() {
-    return 'ChronicleRequest{date: $date, eventName: $eventName, paramName: $paramName, valueStr: $valueStr}';
+    return 'ChronicleRequest{date: $date, eventName: $eventName, paramName: $paramName, valueStr: $valueStr, valueNum: $valueNum}';
   }
 }

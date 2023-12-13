@@ -18,7 +18,8 @@ class NewEventWidget extends StatefulWidget {
 
 class _NewEventWidgetState extends State<NewEventWidget> {
   final TextEditingController eventNameCtrl = TextEditingController();
-  final Map<String, String> paramNamesValues = {}; // paramName => paramValue (only for current Event Name)
+  final Map<String, String> paramNamesStrValues = {}; // paramName => string  Value for current Event Name
+  final Map<String, double> paramNamesNumValues = {}; // paramName => numeric Value for current Event Name
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,8 @@ class _NewEventWidgetState extends State<NewEventWidget> {
               itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
               onSuggestionSelected: (newValue) => setState(() {
                 eventNameCtrl.text = newValue;
-                paramNamesValues.clear();
+                paramNamesStrValues.clear();
+                paramNamesNumValues.clear();
               }),
               hideOnEmpty: true,
             ),
@@ -58,7 +60,8 @@ class _NewEventWidgetState extends State<NewEventWidget> {
           tooltip: "Submit",
           child: const Icon(Icons.send_rounded, size: 30),
           onPressed: () {
-            paramNamesValues.forEach((paramName, paramValue) => model.addForDate(widget.date, eventNameCtrl.text, paramName, paramValue));
+            paramNamesStrValues.forEach((paramName, paramValue) => model.addStrForDate(widget.date, eventNameCtrl.text, paramName, paramValue));
+            paramNamesNumValues.forEach((paramName, paramValue) => model.addNumForDate(widget.date, eventNameCtrl.text, paramName, paramValue));
             Navigator.pop(context);
           },
         ),
@@ -67,19 +70,24 @@ class _NewEventWidgetState extends State<NewEventWidget> {
   }
 
   Widget _makeParamWidget(Param p) {
-    if (p.defaultValue != null)
-      paramNamesValues[p.name] = p.defaultValue!;
+    final isNumeric = p.type == "N"; // "N" or "S" possible
+
+    if (p.defaultValue != null) {
+      // onChange() is not called on TextFormField when "initialValue" is assigned, so we need to store initial values explicitly
+      isNumeric ? paramNamesNumValues[p.name] = double.parse(p.defaultValue!) : paramNamesStrValues[p.name] = p.defaultValue!;
+    }
+
     return TrixContainer(child: ListTile(
       title: Text(p.name),
-      subtitle: Text(p.description ?? "no description"),
+      subtitle: Text(p.description ?? "No description"),
       trailing: SizedBox(
         width: 180,
         child: TextFormField(
           initialValue: p.defaultValue,
-          inputFormatters: p.type == "N" ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
-          keyboardType: p.type == "N" ? const TextInputType.numberWithOptions(decimal: true) : null,
+          inputFormatters: isNumeric ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
+          keyboardType: isNumeric ? const TextInputType.numberWithOptions(decimal: true) : null,
           decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Value"),
-          onChanged: (s) => paramNamesValues[p.name] = s,
+          onChanged: (s) => isNumeric ? paramNamesNumValues[p.name] = double.parse(s) : paramNamesStrValues[p.name] = s,
         )
       ),
     ));

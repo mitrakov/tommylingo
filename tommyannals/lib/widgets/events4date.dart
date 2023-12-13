@@ -34,7 +34,7 @@ class EventsForDateViewer extends StatelessWidget {
   Widget _createTile(Chronicle chronicle) {
     return TrixContainer(child: ListTile(
       title: Text(chronicle.eventName, textScaleFactor: 1.5),
-      trailing: Text(chronicle.valueStr ?? "–"),
+      trailing: Text(chronicle.valueStr ?? "${chronicle.valueNum}"),
     ));
   }
 }
