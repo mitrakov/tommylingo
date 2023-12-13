@@ -84,7 +84,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
           initialValue: p.defaultValue,
           inputFormatters: isNumeric ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
           keyboardType: isNumeric ? const TextInputType.numberWithOptions(decimal: true) : null,
-          decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Valor"),
+          decoration: InputDecoration(border: const OutlineInputBorder(), labelText: p.unit != null ? "Valor (${p.unit})" : "Valor"),
           onChanged: (s) => isNumeric ? paramNamesNumValues[p.name] = _parseDouble(s) : paramNamesStrValues[p.name] = s,
         )
       ),

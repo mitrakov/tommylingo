@@ -10,6 +10,7 @@ Param _$ParamFromJson(Map<String, dynamic> json) => Param(
       json['name'] as String,
       json['description'] as String?,
       json['type'] as String,
+      json['unit'] as String?,
       json['defaultValue'] as String?,
     );
 
@@ -17,6 +18,7 @@ Map<String, dynamic> _$ParamToJson(Param instance) => <String, dynamic>{
       'name': instance.name,
       'description': instance.description,
       'type': instance.type,
+      'unit': instance.unit,
       'defaultValue': instance.defaultValue,
     };
 
