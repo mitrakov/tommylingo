@@ -18,7 +18,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  DateTime _currentDate = DateTime.now();
+  DateTime _focusedDate = DateTime.now();
+  DateTime? _selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -30,23 +31,32 @@ class _MyAppState extends State<MyApp> {
         body: Column(
           children: [
             TableCalendar(
-              startingDayOfWeek: StartingDayOfWeek.monday,
+              startingDayOfWeek: StartingDayOfWeek.monday, // Sunday by default
               locale: "es_ES", // make sure to call initializeDateFormatting() from import 'package:intl/date_symbol_data_local.dart';
-              focusedDay: DateTime.now(),
               firstDay: DateTime.utc(2000),
               lastDay: DateTime.utc(2040),
-              onDaySelected: (selectedDate, focusedDate) => setState(() { _currentDate = selectedDate; }),
+              focusedDay: _focusedDate,
+              selectedDayPredicate: (day) => isSameDay(_selectedDate, day), // https://github.com/aleksanderwozniak/table_calendar/blob/master/example/lib/pages/basics_example.dart
+              onPageChanged: (focusedDay) { _focusedDate = focusedDay; },   // no need to "setState()" here
+              onDaySelected: (selectedDate, focusedDate) {
+                if (!isSameDay(_selectedDate, selectedDate)) {
+                  setState(() {
+                    _selectedDate = selectedDate;
+                    _focusedDate = focusedDate;
+                  });
+                }
+              },
             ),
             const Text("Eventos", textScaleFactor: 1.4),
-            Expanded(child: EventsForDateViewer(_currentDate)),
+            Expanded(child: EventsForDateViewer(_focusedDate)),
           ],
         ),
-        floatingActionButton: Builder( //*
+        floatingActionButton: Builder( // to avoid error: "Navigator operation requested with a context that does not include a Navigator."
           builder: (context) {
             return FloatingActionButton(
               tooltip: "Add new event",
               child: const Icon(Icons.add, size: 40),
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget(_currentDate))),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewEventWidget(_focusedDate))),
             );
           }
         )
@@ -54,5 +64,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-// *) to avoid error: "Navigator operation requested with a context that does not include a Navigator."
