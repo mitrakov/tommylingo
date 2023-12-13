@@ -17,7 +17,7 @@ case class ChronicleResponseEvent(eventName: String, params: List[ChronicleRespo
 case class ChronicleResponse(date: LocalDate, events: List[ChronicleResponseEvent])
 
 // === Schema Response ===
-case class SchemaResponseParam(name: String, description: Option[String], `type`: String, defaultValue: Option[String])
+case class SchemaResponseParam(name: String, description: Option[String], `type`: String, unit: Option[String], defaultValue: Option[String])
 case class SchemaResponse(eventName: String, eventDescription: Option[String], params: List[SchemaResponseParam])
 // ===
 

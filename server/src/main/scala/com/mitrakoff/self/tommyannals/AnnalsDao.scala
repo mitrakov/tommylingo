@@ -7,7 +7,7 @@ import java.time.LocalDate
 // notes: you must specify schema name (`annals.`) explicitly!
 class AnnalsDao[F[_]](db: Db[F]):
   case class Chronicle(date: LocalDate, eventName: String, paramName: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
-  case class EventParam(eventName: String, eventDescription: Option[String], name: String, description: Option[String], `type`: String, defaultValue: Option[String])
+  case class EventParam(eventName: String, eventDescription: Option[String], name: String, description: Option[String], `type`: String, unit: Option[String], defaultValue: Option[String])
 
   def fetchAllForDate(userId: Id, date: LocalDate): F[List[Chronicle]] =
     import doobie.implicits.javatimedrivernative._
@@ -18,8 +18,8 @@ class AnnalsDao[F[_]](db: Db[F]):
                  WHERE date = $date AND user_id = $userId;""".query[Chronicle].to[List]
     )
 
-  def fetchEventsAndParams(userId: Id): F[List[EventParam]] =
-    db.run(sql"""SELECT event.name, event.description, param.name, param.description, param.type, param.default_value
+  def fetchSchema(userId: Id): F[List[EventParam]] =
+    db.run(sql"""SELECT event.name, event.description, param.name, param.description, param.type, param.unit, param.default_value
                  FROM annals.event
                  INNER JOIN annals.param USING(event_id)
                  WHERE user_id = $userId;""".query[EventParam].to[List]

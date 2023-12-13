@@ -14,8 +14,8 @@ class AnnalsService[F[_]: Monad](dao: AnnalsDao[F]):
 
   def getSchema(userId: Id): F[List[SchemaResponse]] =
     import cats.implicits.toFunctorOps
-    dao.fetchEventsAndParams(userId) map { list =>
-      val grouped = list.groupMap(p => p.eventName -> p.eventDescription) (p => SchemaResponseParam(p.name, p.description, p.`type`, p.defaultValue))
+    dao.fetchSchema(userId) map { list =>
+      val grouped = list.groupMap(p => p.eventName -> p.eventDescription) (p => SchemaResponseParam(p.name, p.description, p.`type`, p.unit, p.defaultValue))
       grouped.map { case ((eventName, eventDescription), params) => SchemaResponse(eventName, eventDescription, params) }.toList
     }
 
