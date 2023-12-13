@@ -8,7 +8,8 @@ import java.time.LocalDate
 type Id = Int
 
 // === Chronicle Add Request (POST) ===
-case class ChronicleAddRequest(date: LocalDate, eventName: String, paramName: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
+case class ChronicleAddRequestParam(name: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
+case class ChronicleAddRequest(date: LocalDate, eventName: String, params: List[ChronicleAddRequestParam])
 
 // === Chronicle Response (GET) ===
 case class ChronicleResponseParam(paramName: String, valueNum: Option[Double], valueStr: Option[String], comment: Option[String])
@@ -29,4 +30,5 @@ object ChronicleResponse:
   given Encoder[ChronicleResponse] = deriveEncoder
 
 object ChronicleAddRequest:
+  given Decoder[ChronicleAddRequestParam] = deriveDecoder
   given Decoder[ChronicleAddRequest] = deriveDecoder

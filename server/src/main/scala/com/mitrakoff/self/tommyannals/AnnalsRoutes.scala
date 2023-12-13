@@ -32,8 +32,8 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
       case GET -> Root / `annals` / "schema" as userId =>
         given EntityEncoder[F, List[SchemaResponse]] = jsonEncoderOf
         for {
-          evParams <- annalsService.getSchema(userId)
-          response <- Ok(evParams)
+          schema   <- annalsService.getSchema(userId)
+          response <- Ok(schema)
         } yield response
 
       case GET -> Root / `annals` / date as userId =>
@@ -41,19 +41,16 @@ class AnnalsRoutes[F[_]: Concurrent](authService: AuthService[F], annalsService:
         Try(LocalDate.parse(date)) match
           case Failure(error) => BadRequest(s"Cannot parse date: $date (${error.getMessage})")
           case Success(parsed) => for {
-            list <- annalsService.getAllForDate(userId, parsed)
-            response <- Ok(list)
+            chronicle <- annalsService.getAllForDate(userId, parsed)
+            response <- Ok(chronicle)
           } yield response
 
       case req@POST -> Root / `annals` as userId =>
         given EntityDecoder[F, ChronicleAddRequest] = jsonOf
         for {
           request <- req.req.as[ChronicleAddRequest]
-          eventIdOpt <- annalsService.getEventIdByName(userId, request.eventName)
-          paramIdOpt <- annalsService.getParamIdByName(userId, eventIdOpt.getOrElse(-1), request.paramName)
-          response <- paramIdOpt.fold(NotFound(s"Event/Param not found: ${request.eventName}/${request.paramName}")) { paramId =>
-            annalsService.add(request, paramId).flatMap(rows => Ok(s"$rows row(s) added"))
-          }
+          rows <- annalsService.add(userId, request)
+          response <- Ok(s"$rows row(s) added")
         } yield response
 
       case DELETE -> Root / `annals` as userId => Ok(s"DEL: $userId")
