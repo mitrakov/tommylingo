@@ -1,16 +1,13 @@
 package com.mitrakoff.self.tommyannals
 
-import cats.Monad
+import cats.{Applicative, Monad}
+import io.circe.jawn.parse // TODO
 import java.time.LocalDate
 
 class AnnalsService[F[_]: Monad](dao: AnnalsDao[F]):
-  def getAllForDate(userId: Id, date: LocalDate): F[ChronicleResponse] =
+  def getAllForDate(userId: Id, date: LocalDate): F[List[Chronicle]] =
     import cats.implicits.toFunctorOps
-    dao.fetchAllForDate(userId, date) map { list =>
-      val grouped = list.groupMap(_.eventName)(ch => ChronicleResponseParam(ch.paramName, ch.valueNum, ch.valueStr, ch.comment))
-      val events = grouped.map {case (eventName, params) => ChronicleResponseEvent(eventName, params) }.toList
-      ChronicleResponse(date, events)
-    }
+    dao.fetchAllForDate(userId, date).map( _.map(c => Chronicle(c.date, c.eventName, parse(c.params).getOrElse(???), c.comment)) ) // TODO JsonObject
 
   def getSchema(userId: Id): F[List[SchemaResponse]] =
     import cats.implicits.toFunctorOps
@@ -19,15 +16,10 @@ class AnnalsService[F[_]: Monad](dao: AnnalsDao[F]):
       grouped.map { case ((eventName, eventDescription), params) => SchemaResponse(eventName, eventDescription, params) }.toList
     }
 
-  def add(userId: Id, r: ChronicleAddRequest): F[Int] =
-    import cats.implicits.{toFlatMapOps, toFunctorOps, toTraverseOps}
+  def add(userId: Id, r: Chronicle): F[Int] =
+    import cats.implicits.toFlatMapOps
     dao.findEventId(userId, r.eventName) flatMap { eventIdOpt =>
-      val eventId = eventIdOpt.getOrElse(throw new IllegalStateException(s"Event not found: ${r.eventName}"))
-      val rowsAdded: F[List[Int]] = r.params traverse { param =>
-        dao.findParamId(userId, eventId, param.name) flatMap { paramIdOpt =>
-          val paramId = paramIdOpt.getOrElse(throw new IllegalStateException(s"Param not found: ${param.name}"))
-          dao.insert(r.date, paramId, param.valueNum, param.valueStr, param.comment)
-        }
-      }
-      rowsAdded map (_.sum)
+      eventIdOpt match
+        case Some(eventId) => dao.insert(r.date, eventId, r.params.toString, r.comment)
+        case None => implicitly[Applicative[F]].pure(0)
     }
