@@ -72,10 +72,10 @@ class _NewEventWidgetState extends State<NewEventWidget> {
     storeParam(String value) {
       switch (p.type) {
         case "S":
-          paramNames2Values[p.nameUtf8] = value;
+          paramNames2Values[p.nameUtf8] = value.trim();
           break;
         case "N":
-          paramNames2Values[p.nameUtf8] = int.tryParse(value) ?? double.tryParse(value);
+          paramNames2Values[p.nameUtf8] = int.tryParse(value.trim()) ?? double.tryParse(value.trim().replaceAll(",", "."));
           break;
         case "B":
           paramNames2Values[p.nameUtf8] = value.trim().toLowerCase() == "true";
@@ -85,7 +85,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
     }
 
     if (p.defaultValueUtf8 != null) // onChange() is not called on TextFormField when "initialValue" is assigned, so we need to store initial values explicitly
-      storeParam(p.defaultValueUtf8!.trim());
+      storeParam(p.defaultValueUtf8!);
     final isNumeric = p.type == "N";
     return TrixContainer(child: ListTile(
       title: Text(p.nameUtf8),
@@ -99,7 +99,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
           decoration: InputDecoration(border: const OutlineInputBorder(), labelText: p.unitUtf8 != null ? "Valor (${p.unitUtf8})" : "Valor"),
           onChanged: (s) {
             if (s.isEmpty) paramNames2Values.remove(p.nameUtf8);
-            else storeParam(s.trim());
+            else storeParam(s);
           },
         )
       ),
