@@ -12,6 +12,7 @@ class AnnalsDao[F[_]](db: Db[F]):
 
   def fetchAllForDate(userId: Id, date: LocalDate): F[List[Chronicle]] =
     import doobie.implicits.javatimedrivernative.JavaTimeLocalDateMeta
+    import doobie.postgres.circe.jsonb.implicits.jsonbGet // this is needed for JSONB!
     db.run(sql"""SELECT date, event.name, params, comment
                  FROM annals.chronicle
                  INNER JOIN annals.event USING(event_id)
