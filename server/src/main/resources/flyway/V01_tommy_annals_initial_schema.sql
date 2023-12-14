@@ -1,7 +1,7 @@
 -- SCHEMA
 CREATE SCHEMA IF NOT EXISTS annals;
 SET search_path TO annals;
-CREATE TYPE ParamType AS ENUM ('N', 'S');
+CREATE TYPE ParamType AS ENUM ('N', 'S', 'B', 'N[]', 'S[]', 'B[]'); -- number, string, boolean, number array, string array, boolean array
 
 
 
@@ -66,18 +66,14 @@ COMMENT ON COLUMN param.created_at IS 'Current timestamp';
 CREATE TABLE IF NOT EXISTS chronicle (
   id BIGSERIAL PRIMARY KEY NOT NULL,
   date DATE NOT NULL DEFAULT now(),
-  param_id INT NOT NULL REFERENCES param (param_id) ON UPDATE CASCADE ON DELETE RESTRICT,
-  value_num DECIMAL NULL,
-  value_str VARCHAR(255) NULL CHECK (value_num IS NOT NULL OR value_str IS NOT NULL),
+  event_id INT NOT NULL REFERENCES event (event_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+  params JSONB NOT NULL,
   comment VARCHAR(255) NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT chronicle_date_param UNIQUE (date, param_id)
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-COMMENT ON TABLE  chronicle IS 'Main table; stores parameter key-value pairs for each date';
+COMMENT ON TABLE  chronicle IS 'Main table; stores events (possibly multiple!) for each date';
 COMMENT ON COLUMN chronicle.id IS 'Primary key, auto-incremented';
 COMMENT ON COLUMN chronicle.date IS 'Date';
-COMMENT ON COLUMN chronicle.param_id IS 'Foreign key to parameters';
-COMMENT ON COLUMN chronicle.value_num IS 'Numeric value of the event, optional but either `value_num` or `value_str` must be defined';
-COMMENT ON COLUMN chronicle.value_str IS 'String value of the event, optional but either `value_num` or `value_str` must be defined';
+COMMENT ON COLUMN chronicle.params IS 'Json object containing paramName<->paramValue pairs for a given event, e.g. {"steps": 5000, "walk": true, "where": "London"}';
 COMMENT ON COLUMN chronicle.comment IS 'Comment on this record, optional';
 COMMENT ON COLUMN chronicle.created_at IS 'Current timestamp';

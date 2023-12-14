@@ -42,3 +42,7 @@ object Main extends IOApp.Simple:
       xa <- HikariTransactor.newHikariTransactor[F](driver, url, user, password, connectEc)
     } yield xa
   }
+
+// bugs:
+// Annals:
+// 1) if (param.name == "Número") shows as N⛄︎mero => cannot find ParamName, throws s"Param not found: ${param.name}"
