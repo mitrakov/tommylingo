@@ -1,13 +1,12 @@
 package com.mitrakoff.self.tommyannals
 
 import cats.{Applicative, Monad}
-import io.circe.jawn.parse // TODO
 import java.time.LocalDate
 
 class AnnalsService[F[_]: Monad](dao: AnnalsDao[F]):
   def getAllForDate(userId: Id, date: LocalDate): F[List[Chronicle]] =
     import cats.implicits.toFunctorOps
-    dao.fetchAllForDate(userId, date).map( _.map(c => Chronicle(c.date, c.eventName, parse(c.params).getOrElse(???), c.comment)) ) // TODO JsonObject
+    dao.fetchAllForDate(userId, date).map( _.map(c => Chronicle(c.date, c.eventName, c.params, c.comment)) )
 
   def getSchema(userId: Id): F[List[SchemaResponse]] =
     import cats.implicits.toFunctorOps
@@ -20,6 +19,6 @@ class AnnalsService[F[_]: Monad](dao: AnnalsDao[F]):
     import cats.implicits.toFlatMapOps
     dao.findEventId(userId, r.eventName) flatMap { eventIdOpt =>
       eventIdOpt match
-        case Some(eventId) => dao.insert(r.date, eventId, r.params.toString, r.comment)
+        case Some(eventId) => dao.insert(r.date, eventId, r.params, r.comment)
         case None => implicitly[Applicative[F]].pure(0)
     }
