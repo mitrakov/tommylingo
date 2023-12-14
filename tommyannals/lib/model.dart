@@ -2,15 +2,14 @@
 import 'dart:convert';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:tommyannals/chronicle/chronicle_add_request.dart';
-import 'package:tommyannals/chronicle/chronicle_response.dart';
+import 'package:tommyannals/chronicle/chronicle.dart';
 import 'package:tommyannals/chronicle/schema.dart';
 
 class MyModel extends Model {
-  final Map<DateTime, ChronicleResponse> _date2data = {};
+  final Map<DateTime, List<Chronicle>> _date2data = {};
   final List<Schema> _schema = [];
 
-  Future<ChronicleResponse> getForDate(DateTime date) async {
+  Future<List<Chronicle>> getForDate(DateTime date) async {
     final data = _date2data[date];
     if (data == null) {
       final newData = await _loadForDate(date);
@@ -28,12 +27,12 @@ class MyModel extends Model {
     return _schema;
   }
 
-  Future<String> addForDate(DateTime date, String eventName, List<ChronicleAddRequestParam> params) {
-    return _addForDate(date, ChronicleAddRequest(_extractDate(date), eventName, params));
+  Future<String> addForDate(DateTime date, String eventName, Map<String, dynamic> params, String? comment) {
+    return _addForDate(date, Chronicle(_extractDate(date), eventName, params, comment));
   }
 
-  Future<String> _addForDate(DateTime key, ChronicleAddRequest request) async {
-    final body = json.encode(request.toJson());
+  Future<String> _addForDate(DateTime key, Chronicle item) async {
+    final body = json.encode(item.toJson());
     print("POST http://mitrakoff.com:9090/annals: $body");
     final response = await http.post(Uri.parse("http://mitrakoff.com:9090/annals"), headers: {"Authorization": "bearer 555"}, body: body);
     print("> ${response.body}");
@@ -44,13 +43,15 @@ class MyModel extends Model {
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 
-  Future<ChronicleResponse> _loadForDate(DateTime date) async {
+  Future<List<Chronicle>> _loadForDate(DateTime date) async {
     final formatted = _extractDate(date);
     print("GET http://mitrakoff.com:9090/annals/$formatted");
     final response = await http.get(Uri.parse("http://mitrakoff.com:9090/annals/$formatted"), headers: {"Authorization": "bearer 555"});
     print("> ${response.body}");
     if (response.statusCode == 200) {
-      return ChronicleResponse.fromJson(json.decode(response.body));
+      final list = json.decode(response.body) as List<dynamic>;
+      final cast = list.map((e) => e as Map<String, dynamic>);
+      return cast.map(Chronicle.fromJson).toList();
     } else return Future.error("Error: ${response.statusCode}; ${response.body}");
   }
 

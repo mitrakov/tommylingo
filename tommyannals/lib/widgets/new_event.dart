@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:tommyannals/chronicle/chronicle_add_request.dart';
 import 'package:tommyannals/chronicle/schema.dart';
 import 'package:tommyannals/model.dart';
 import 'package:tommyannals/widgets/trixcontainer.dart';
@@ -19,8 +18,7 @@ class NewEventWidget extends StatefulWidget {
 
 class _NewEventWidgetState extends State<NewEventWidget> {
   final TextEditingController eventNameCtrl = TextEditingController();
-  final Map<String, String> paramNamesStrValues = {}; // paramName => string  Value for current Event Name
-  final Map<String, double> paramNamesNumValues = {}; // paramName => numeric Value for current Event Name
+  final Map<String, dynamic> paramNames2Values = {}; // paramName => paramValue for current Event Name
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +45,7 @@ class _NewEventWidgetState extends State<NewEventWidget> {
               itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
               onSuggestionSelected: (newValue) => setState(() {
                 eventNameCtrl.text = newValue;
-                paramNamesStrValues.clear();
-                paramNamesNumValues.clear();
+                paramNames2Values.clear();
               }),
               hideOnEmpty: true,
             ),
@@ -72,44 +69,47 @@ class _NewEventWidgetState extends State<NewEventWidget> {
   }
 
   Widget _makeParamWidget(Param p) {
-    final isNumeric = p.type == "N"; // "N" or "S" possible
-
-    if (p.defaultValue != null) {
-      // onChange() is not called on TextFormField when "initialValue" is assigned, so we need to store initial values explicitly
-      isNumeric ? paramNamesNumValues[p.name] = _parseDouble(p.defaultValue!) : paramNamesStrValues[p.name] = p.defaultValue!;
+    storeParam(String value) {
+      switch (p.type) {
+        case "S":
+          paramNames2Values[p.nameUtf8] = value;
+          break;
+        case "N":
+          paramNames2Values[p.nameUtf8] = int.tryParse(value) ?? double.tryParse(value);
+          break;
+        case "B":
+          paramNames2Values[p.nameUtf8] = value.trim().toLowerCase() == "true";
+          break;
+        // add other types here
+      }
     }
 
+    if (p.defaultValueUtf8 != null) // onChange() is not called on TextFormField when "initialValue" is assigned, so we need to store initial values explicitly
+      storeParam(p.defaultValueUtf8!.trim());
+    final isNumeric = p.type == "N";
     return TrixContainer(child: ListTile(
-      title: Text(p.name),
-      subtitle: Text(p.description ?? "Ninguna descripción"),
+      title: Text(p.nameUtf8),
+      subtitle: Text(p.descriptionUtf8 ?? "Ninguna descripción"),
       trailing: SizedBox(
         width: 170,
         child: TextFormField(
-          initialValue: p.defaultValue,
+          initialValue: p.defaultValueUtf8,
           inputFormatters: isNumeric ? [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))] : null,  // digits, "." for Android, "," for iOS
-          keyboardType: isNumeric ? const TextInputType.numberWithOptions(decimal: true) : null,
-          decoration: InputDecoration(border: const OutlineInputBorder(), labelText: p.unit != null ? "Valor (${p.unit})" : "Valor"),
-          onChanged: (s) => isNumeric ? paramNamesNumValues[p.name] = _parseDouble(s) : paramNamesStrValues[p.name] = s,
+          keyboardType: isNumeric ? const TextInputType.numberWithOptions(decimal: true) : null, // TODO: add Boolean type
+          decoration: InputDecoration(border: const OutlineInputBorder(), labelText: p.unitUtf8 != null ? "Valor (${p.unitUtf8})" : "Valor"),
+          onChanged: (s) {
+            if (s.isEmpty) paramNames2Values.remove(p.nameUtf8);
+            else storeParam(s.trim());
+          },
         )
       ),
     ));
   }
 
   void _submit(MyModel model) {
-    final params = [
-    ...paramNamesStrValues.entries.map((e) => ChronicleAddRequestParam(e.key, e.value, null)),
-    ...paramNamesNumValues.entries.map((e) => ChronicleAddRequestParam(e.key, null, e.value)),
-    ];
-    if (params.isNotEmpty) {
-      model.addForDate(widget.date, eventNameCtrl.text, params);
+    if (paramNames2Values.isNotEmpty) {
+      model.addForDate(widget.date, eventNameCtrl.text, paramNames2Values, null);
       Navigator.pop(context);
     } else ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Especifique los parámetros")));
-  }
-
-  double _parseDouble(String s) {
-    final d = double.tryParse(s.replaceAll(",", "."));
-    if (d == null)
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("No se puede analizar el número: $s")));
-    return d ?? -1;
   }
 }
