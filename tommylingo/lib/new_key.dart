@@ -27,14 +27,14 @@ class NewKey extends StatelessWidget {
             children: [
               const SizedBox(height: 10),
               TypeAheadField<String>(
-                textFieldConfiguration: TextFieldConfiguration(controller: keyController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Key")),
+                builder: (c, t, _) => TextField(controller: keyController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Key")),
                 suggestionsCallback: (prefix) {
                   final list = List<String>.from(model.keys);
                   list.retainWhere((s) => s.toLowerCase().contains(prefix.toLowerCase()));
                   return list;
                 },
                 itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
-                onSuggestionSelected: (newValue) => keyController.text = newValue,
+                onSelected: (newValue) => keyController.text = newValue,
                 hideOnEmpty: true,
               ),
               const SizedBox(height: 20),

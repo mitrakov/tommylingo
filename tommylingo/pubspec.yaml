@@ -1,23 +1,24 @@
-# Built with Flutter 3.7.12, CocoaPods 1.11.3
+# Built with Flutter 3.16.9, CocoaPods 1.14.3
 name: tommylingo
 description: Tommylingo Mobile App
-version: 23.5.15+6
+version: 23.3.3+7
 publish_to: 'none' # to prevent publish with 'flutter pub publish'
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: '>=3.2.6 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
   scoped_model: 2.0.0         # state management
-  http: 0.13.6                # http support
-  xml: 6.2.2                  # xml parsing
-  tuple: 2.0.1                # tuples
-  flutter_typeahead: 4.3.8    # text field with suggestions
+  http: 1.2.0                 # http support (1.2.1 is incompatible with sdk 3.2.6)
+  xml: 6.5.0                  # xml parsing
+  tuple: 2.0.2                # tuples
+  flutter_typeahead: 5.2.0    # text field with suggestions
+  shared_preferences: 2.2.2   # key-value storage
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: 3.0.1
 
 flutter:
   uses-material-design: true

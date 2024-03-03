@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:tommylingo/model.dart';
 import 'package:tommylingo/new_key.dart';
+import 'package:tommylingo/progress_widget.dart';
+import 'package:tommylingo/settings.dart';
 import 'package:tommylingo/utils.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // allow "async" in main() method
+  await Settings.instance.init();
   runApp(ScopedModel(model: MyModel(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
+  final progressKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,12 +23,16 @@ class MyApp extends StatelessWidget {
       home: ScopedModelDescendant<MyModel>(builder: (context, child, model) {
         return FutureBuilder(future: model.token, builder: (context, snapshot) {
           return Scaffold(
-            appBar: AppBar(title: const Text("Tommylingo")),
+            appBar: AppBar(
+              title: const Text("Tommylingo"),
+              actions: [TotalProgressWidget(key: progressKey)],
+            ),
             body: snapshot.hasData
               ? GestureDetector(
                   onTap: () {
                     if (snapshot.data!.item1.isNotEmpty)
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(snapshot.data!.item1), duration: const Duration(seconds: 2), backgroundColor: Colors.grey));
+                    (progressKey.currentState as TotalProgressWidgetState).addOne();
                     model.nextToken();
                   },
                   child: Center(
@@ -32,7 +41,7 @@ class MyApp extends StatelessWidget {
                       children: [
                         Text(
                           snapshot.data!.item2.isNotEmpty ? snapshot.data!.item2 : "Press ☰ and choose language...",
-                          style: Theme.of(context).textTheme.headlineSmall
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
                         const SizedBox(height: 120) // to make a text a bit higher
                       ],
@@ -47,7 +56,7 @@ class MyApp extends StatelessWidget {
                   width: double.infinity,
                   child: DrawerHeader(
                     decoration: const BoxDecoration(color: Colors.lightGreen),
-                    child: Text("Languages", style: Theme.of(context).textTheme.headlineMedium)
+                    child: Text("Languages", style: Theme.of(context).textTheme.headlineMedium),
                   ),
                 ),
                 Expanded(
@@ -117,7 +126,7 @@ class MyApp extends StatelessWidget {
                       });
                     }
                   },
-                )
+                ),
               ],
             ),
           );
