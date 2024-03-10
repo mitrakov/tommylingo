@@ -22,14 +22,11 @@ class TotalProgressWidgetState extends State<TotalProgressWidget> {
     final firstDay = Settings.instance.getFirstDate();
     final lastDay = Settings.instance.getLastDate();
     final now = DateTime.now();
-    if (lastDay.difference(now).inDays > 0) {
-      _questionsDone = 0; // additional check: if a user didn't close the app from yesterday => reset counter
-    }
-    if (lastDay.difference(now).inDays > 1) {
+    if (now.difference(lastDay).inDays > 1) {
       final text = "Sorry, your progress with ${lastDay.difference(firstDay).inDays} days has been reset!";
       Settings.instance.setFirstDateAsToday();
       Settings.instance.setLastDateAsToday();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text), duration: const Duration(seconds: 5)));
     }
     _firstDay = Settings.instance.getFirstDate();
     _lastDay = Settings.instance.getLastDate();
@@ -39,13 +36,16 @@ class TotalProgressWidgetState extends State<TotalProgressWidget> {
   Widget build(BuildContext context) {
     final isOkToday = _questionsDone >= widget._QUESTIONS;
     final totalDays = _lastDay.difference(_firstDay).inDays + (isOkToday ? 1 : 0);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text("$_questionsDone/${widget._QUESTIONS}", style: TextStyle(color: isOkToday ? Colors.green : Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold)),
-        const SizedBox(width: 10),
-        Text("Total days: $totalDays"),
-      ],
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("$_questionsDone/${widget._QUESTIONS}", style: TextStyle(color: isOkToday ? Colors.green : Colors.redAccent, fontSize: 16, fontWeight: FontWeight.bold)),
+          const SizedBox(width: 10),
+          Text("Total days: $totalDays"),
+        ],
+      ),
     );
   }
 

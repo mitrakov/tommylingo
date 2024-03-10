@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Tommylingo",
       theme: ThemeData(primarySwatch: Colors.green),
+      debugShowCheckedModeBanner: false,
       home: ScopedModelDescendant<MyModel>(builder: (context, child, model) {
         return FutureBuilder(future: model.token, builder: (context, snapshot) {
           return Scaffold(
@@ -31,7 +32,12 @@ class MyApp extends StatelessWidget {
               ? GestureDetector(
                   onTap: () {
                     if (snapshot.data!.item1.isNotEmpty)
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(snapshot.data!.item1), duration: const Duration(seconds: 2), backgroundColor: Colors.grey));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(snapshot.data!.item1),
+                        duration: const Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.only(top: 1),
+                      ));
                     (progressKey.currentState as TotalProgressWidgetState).addOne();
                     model.nextToken();
                   },

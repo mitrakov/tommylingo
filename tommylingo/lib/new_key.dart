@@ -21,20 +21,28 @@ class NewKey extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MyModel>(builder: (context, child, model) {
       return Scaffold(
-        appBar: AppBar(title: Text(token != null ? 'Edit "${token!.item1}" for ${model.langCode}' : "Add new translation for ${model.langCode}")),
+        appBar: AppBar(title: Text(token != null ? 'Edit "${token!.item1}" for ${model.langCode}' : "New translation for ${model.langCode}")),
         body: Center(
           child: Column(
             children: [
               const SizedBox(height: 10),
               TypeAheadField<String>(
-                builder: (c, t, _) => TextField(controller: keyController, decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Key")),
+                controller: keyController,
+                builder: (c, t, f) => TextField(
+                  controller: keyController,
+                  focusNode: f,
+                  decoration: const InputDecoration(border: OutlineInputBorder(), labelText: "Key"),
+                ),
                 suggestionsCallback: (prefix) {
                   final list = List<String>.from(model.keys);
                   list.retainWhere((s) => s.toLowerCase().contains(prefix.toLowerCase()));
                   return list;
                 },
                 itemBuilder: (context, suggestion) => ListTile(title: Text(suggestion)),
-                onSelected: (newValue) => keyController.text = newValue,
+                onSelected: (newValue) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(model.getValue(newValue)), duration: const Duration(seconds: 1)));
+                  keyController.text = newValue;
+                },
                 hideOnEmpty: true,
               ),
               const SizedBox(height: 20),

@@ -2,7 +2,7 @@
     package="com.mitrakoff.self.tommylingo">
    <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="tommylingo"
+        android:label="Tommylingo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

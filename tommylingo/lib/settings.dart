@@ -20,13 +20,21 @@ class Settings {
   DateTime getFirstDate() {
     _check();
     final day = _storage!.getString(_firstDate);
-    return day != null ? DateTime.parse(day) : DateTime.now();
+    if (day == null) {
+      setFirstDateAsToday();
+      return getFirstDate();
+    }
+    return DateTime.parse(day);
   }
 
   DateTime getLastDate() {
     _check();
     final day = _storage!.getString(_lastDate);
-    return day != null ? DateTime.parse(day) : DateTime.now();
+    if (day == null) {
+      setLastDateAsToday();
+      return getLastDate();
+    }
+    return DateTime.parse(day);
   }
 
   Future<bool> setFirstDateAsToday() {
@@ -37,6 +45,11 @@ class Settings {
   Future<bool> setLastDateAsToday() {
     _check();
     return _storage!.setString(_lastDate, DateTime.now().toString());
+  }
+
+  Future<bool> invalidate() {
+    _check();
+    return _storage!.clear();
   }
 
   void _check() {
